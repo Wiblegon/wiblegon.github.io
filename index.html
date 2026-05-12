@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WIBLEGON — Kick Yayıncısı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --kick: #53fc18;
+    --kick-dim: rgba(83,252,24,0.12);
+    --kick-glow: rgba(83,252,24,0.35);
+    --red: #ff3c3c;
+    --red-dim: rgba(255,60,60,0.12);
+    --bg: #07090f;
+    --bg2: #0c0f1a;
+    --bg3: #111827;
+    --bg4: #1a2030;
+    --border: rgba(255,255,255,0.06);
+    --border-accent: rgba(83,252,24,0.25);
+    --text: #dde4f0;
+    --muted: #64748b;
+    --font-display: 'Orbitron', monospace;
+    --font-body: 'Rajdhani', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.7;
+    font-weight: 400;
+    overflow-x: hidden;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg2); }
+  ::-webkit-scrollbar-thumb { background: var(--kick); border-radius: 3px; }
+
+  /* BACKGROUND GRID */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(83,252,24,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(83,252,24,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: rgba(7,9,15,0.88);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: var(--kick);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    text-shadow: 0 0 20px var(--kick-glow);
+    flex-shrink: 0;
+  }
+
+  .nav-logo span { color: var(--text); }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
+    list-style: none;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .nav-links a {
+    display: block;
+    padding: 0.35rem 0.75rem;
+    color: var(--muted);
+    text-decoration: none;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    transition: color 0.2s, background 0.2s;
+    white-space: nowrap;
+  }
+
+  .nav-links a:hover {
+    color: var(--kick);
+    background: var(--kick-dim);
+  }
+
+  /* HAMBURGER */
+  .nav-hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 4px;
+    background: none;
+    border: none;
+  }
+  .nav-hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--text);
+    border-radius: 2px;
+    transition: all 0.3s;
+  }
+
+  /* MOBILE NAV */
+  .mobile-nav {
+    display: none;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    background: rgba(7,9,15,0.97);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 2rem;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .mobile-nav.open { display: flex; }
+
+  .mobile-nav a {
+    display: block;
+    padding: 0.6rem 0.75rem;
+    color: var(--muted);
+    text-decoration: none;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    transition: color 0.2s, background 0.2s;
+  }
+
+  .mobile-nav a:hover {
+    color: var(--kick);
+    background: var(--kick-dim);
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 100px 2rem 4rem;
+    overflow: hidden;
+  }
+
+  .hero-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -55%);
+    width: 700px;
+    height: 700px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(83,252,24,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-inner { position: relative; z-index: 1; max-width: 860px; }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--kick-dim);
+    border: 1px solid var(--border-accent);
+    color: var(--kick);
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 3px;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-badge::before {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 6px;
+    background: var(--kick);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--kick);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 10vw, 7.5rem);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.25rem;
+    color: #fff;
+  }
+
+  .hero h1 .accent {
+    color: var(--kick);
+    text-shadow: 0 0 40px var(--kick-glow), 0 0 80px rgba(83,252,24,0.15);
+  }
+
+  .hero-sub {
+    font-family: var(--font-body);
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: var(--muted);
+    margin-bottom: 2.5rem;
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-ctas {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 3rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.7rem 1.6rem;
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 4px;
+    border: 1.5px solid;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-primary {
+    background: var(--kick);
+    color: #07090f;
+    border-color: var(--kick);
+    box-shadow: 0 0 24px rgba(83,252,24,0.3);
+  }
+
+  .btn-primary:hover {
+    background: #6aff2a;
+    box-shadow: 0 0 36px rgba(83,252,24,0.5);
+    transform: translateY(-2px);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    border-color: var(--border);
+  }
+
+  .btn-outline:hover {
+    border-color: var(--kick);
+    color: var(--kick);
+    background: var(--kick-dim);
+    transform: translateY(-2px);
+  }
+
+  /* SECTION SCROLL INDICATOR */
+  .scroll-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-family: var(--font-display);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .scroll-hint::after {
+    content: '';
+    display: block;
+    width: 1.5px;
+    height: 30px;
+    background: linear-gradient(to bottom, var(--kick), transparent);
+    border-radius: 1px;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+  }
+
+  /* MAIN WRAPPER */
+  main { position: relative; z-index: 1; }
+
+  /* SECTION BASE */
+  section {
+    padding: 6rem 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-display);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--kick);
+    margin-bottom: 0.75rem;
+  }
+
+  .section-label::before {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 1.5px;
+    background: var(--kick);
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 2.5rem;
+    letter-spacing: -0.01em;
+  }
+
+  /* DIVIDER */
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border), transparent);
+    margin: 0;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 2rem;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: rgba(83,252,24,0.2); }
+
+  /* HAKKIMDA */
+  #hakkimda .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .about-text { font-size: 1.1rem; line-height: 1.8; color: #a8b5cc; }
+  .about-text p { margin-bottom: 1rem; }
+  .about-text p:last-child { margin-bottom: 0; }
+
+  .about-aside {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .stat-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--kick);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+  }
+
+  .stat-card .stat-label {
+    font-family: var(--font-display);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .stat-card .stat-value {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--kick);
+  }
+
+  /* YAYIN DÜZENİ */
+  #yayin-duzeni .layout-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .layout-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+  }
+
+  .layout-card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    background: var(--kick-dim);
+    border: 1px solid var(--border-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+  }
+
+  .layout-card h3 {
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    margin-bottom: 0.6rem;
+    text-transform: uppercase;
+  }
+
+  .layout-card p {
+    font-size: 0.95rem;
+    color: #7a8fa8;
+    line-height: 1.65;
+  }
+
+  /* HAFTALIK PROGRAM */
+  #program .schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .day-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 0.75rem;
+    text-align: center;
+    transition: all 0.2s;
+  }
+
+  .day-card.active {
+    border-color: var(--border-accent);
+    background: var(--kick-dim);
+  }
+
+  .day-card.off {
+    opacity: 0.4;
+    border-color: rgba(255,60,60,0.2);
+    background: var(--red-dim);
+  }
+
+  .day-card .day-name {
+    font-family: var(--font-display);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .day-card.active .day-name { color: var(--kick); }
+  .day-card.off .day-name { color: var(--red); }
+
+  .day-card .day-time {
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  .day-card.off .day-time { color: #ff6b6b; font-size: 0.65rem; }
+
+  .schedule-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--bg3);
+    border: 1px solid rgba(255,60,60,0.2);
+    border-left: 3px solid var(--red);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    font-size: 0.95rem;
+    color: #a8b5cc;
+  }
+
+  .schedule-note::before {
+    content: '!';
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    background: var(--red);
+    color: #fff;
+    border-radius: 50%;
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    font-weight: 700;
+    margin-top: 2px;
+  }
+
+  /* KURALLAR */
+  #kurallar .rules-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .rule-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .rule-item:hover {
+    border-color: rgba(83,252,24,0.2);
+    transform: translateX(4px);
+  }
+
+  .rule-num {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: rgba(83,252,24,0.15);
+    line-height: 1;
+    flex-shrink: 0;
+    width: 36px;
+    text-align: right;
+  }
+
+  .rule-content h3 {
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 0.4rem;
+  }
+
+  .rule-content p {
+    font-size: 0.95rem;
+    color: #7a8fa8;
+    line-height: 1.6;
+  }
+
+  .rule-item.special {
+    border-color: var(--border-accent);
+    background: var(--kick-dim);
+  }
+
+  .rule-item.special .rule-num { color: rgba(83,252,24,0.4); }
+  .rule-item.special .rule-content h3 { color: var(--kick); }
+  .rule-item.special .rule-content p { color: #a8c890; }
+
+  /* CS AYARLARIM */
+  #cs-ayarlari .cs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .cs-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .cs-card-header {
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    padding: 0.875rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .cs-card-header .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--kick);
+    box-shadow: 0 0 6px var(--kick-glow);
+  }
+
+  .cs-card-header h3 {
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #fff;
+  }
+
+  .cs-card-body { padding: 1.25rem; }
+
+  .cs-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+  }
+
+  .cs-row:last-child { border-bottom: none; }
+
+  .cs-row .cs-key {
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .cs-row .cs-val {
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--kick);
+    letter-spacing: 0.05em;
+    background: var(--kick-dim);
+    padding: 3px 8px;
+    border-radius: 3px;
+    border: 1px solid var(--border-accent);
+    cursor: text;
+  }
+
+  .cs-placeholder {
+    color: var(--muted);
+    font-style: italic;
+    font-size: 0.85rem;
+    padding: 0.75rem 0;
+    display: block;
+  }
+
+  /* PC ÖZELLİKLERİ */
+  #pc-ozellikleri .pc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .pc-item {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    transition: border-color 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pc-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(to right, var(--kick), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .pc-item:hover { border-color: rgba(83,252,24,0.25); }
+  .pc-item:hover::before { opacity: 1; }
+
+  .pc-icon {
+    font-size: 1.6rem;
+    line-height: 1;
+  }
+
+  .pc-item-label {
+    font-family: var(--font-display);
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .pc-item-value {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.4;
+    cursor: text;
+  }
+
+  .pc-item-value.placeholder {
+    color: var(--muted);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 0.7rem;
+  }
+
+  /* FOOTER */
+  footer {
+    position: relative;
+    z-index: 1;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    margin-top: 4rem;
+    padding: 4rem 2rem 2rem;
+  }
+
+  .footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .footer-top {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-bottom: 3rem;
+  }
+
+  .footer-brand .logo {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--kick);
+    text-shadow: 0 0 20px var(--kick-glow);
+    margin-bottom: 0.75rem;
+  }
+
+  .footer-brand p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    max-width: 360px;
+  }
+
+  .footer-social h4 {
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--kick);
+    margin-bottom: 1.25rem;
+  }
+
+  .social-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .social-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    padding: 0.6rem 0.875rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    transition: all 0.2s;
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+
+  .social-link:hover {
+    border-color: var(--border-accent);
+    background: var(--kick-dim);
+    color: var(--kick);
+    transform: translateX(4px);
+  }
+
+  .social-link .social-platform {
+    font-family: var(--font-display);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    min-width: 64px;
+  }
+
+  .social-link:hover .social-platform { color: var(--kick); }
+
+  .social-link .social-badge {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: rgba(255,60,60,0.15);
+    color: var(--red);
+    border: 1px solid rgba(255,60,60,0.25);
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-left: auto;
+  }
+
+  .footer-email {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.75rem 0.875rem;
+    border-radius: 6px;
+    border: 1px dashed rgba(83,252,24,0.2);
+    background: var(--kick-dim);
+    font-size: 0.9rem;
+    color: #a8c890;
+  }
+
+  .footer-email span {
+    font-family: var(--font-display);
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--kick);
+    min-width: 70px;
+  }
+
+  .footer-bottom {
+    border-top: 1px solid var(--border);
+    padding-top: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .footer-bottom p {
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+
+  .footer-bottom p strong {
+    color: var(--kick);
+    font-weight: 600;
+  }
+
+  /* DESTEK BÖLÜMÜ */
+  #destek {
+    padding: 4rem 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .support-card {
+    background: linear-gradient(135deg, rgba(83,252,24,0.05), rgba(83,252,24,0.02));
+    border: 1px solid var(--border-accent);
+    border-radius: 12px;
+    padding: 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .support-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(83,252,24,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .support-card h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1rem;
+    position: relative;
+  }
+
+  .support-card p {
+    color: #7a9a7a;
+    font-size: 1.05rem;
+    max-width: 500px;
+    margin: 0 auto 2rem;
+    position: relative;
+  }
+
+  .support-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    position: relative;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    #hakkimda .content-grid {
+      grid-template-columns: 1fr;
+    }
+    .about-aside { flex-direction: row; flex-wrap: wrap; }
+    .stat-card { flex: 1; min-width: 160px; }
+    .footer-top { grid-template-columns: 1fr; gap: 2rem; }
+    #program .schedule-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  @media (max-width: 680px) {
+    nav { padding: 0 1rem; }
+    .nav-links { display: none; }
+    .nav-hamburger { display: flex; }
+    section { padding: 4rem 1.25rem; }
+    #destek { padding: 2rem 1.25rem; }
+    .support-card { padding: 2rem 1.25rem; }
+    #program .schedule-grid { grid-template-columns: repeat(3, 1fr); }
+    .pc-grid { grid-template-columns: repeat(2, 1fr); }
+    footer { padding: 3rem 1.25rem 1.5rem; }
+  }
+
+  /* ANIMATIONS */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* CUSTOM CURSOR */
+  @media (pointer: fine) {
+    * { cursor: none !important; }
+
+    #cursor {
+      position: fixed;
+      top: 0; left: 0;
+      width: 8px; height: 8px;
+      background: var(--kick);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.2s, height 0.2s, background 0.2s;
+      box-shadow: 0 0 10px var(--kick-glow);
+    }
+
+    #cursor-ring {
+      position: fixed;
+      top: 0; left: 0;
+      width: 28px; height: 28px;
+      border: 1px solid rgba(83,252,24,0.5);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: all 0.1s ease;
+    }
+  }
+
+  /* ACTIVE NAV HIGHLIGHT */
+  .nav-links a.active {
+    color: var(--kick);
+    background: var(--kick-dim);
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#hero" class="nav-logo">WIBL<span>EGON</span></a>
+  <ul class="nav-links">
+    <li><a href="#hakkimda">Hakkımda</a></li>
+    <li><a href="#yayin-duzeni">Yayın Düzeni</a></li>
+    <li><a href="#program">Program</a></li>
+    <li><a href="#kurallar">Kurallar</a></li>
+    <li><a href="#cs-ayarlari">CS Ayarları</a></li>
+    <li><a href="#pc-ozellikleri">Ekipman</a></li>
+    <li><a href="#destek" style="color:var(--kick);">Destek Ol!</a></li>
+  </ul>
+  <button class="nav-hamburger" id="hamburger" aria-label="Menü">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBİL MENÜ -->
+<div class="mobile-nav" id="mobileNav">
+  <a href="#hakkimda">Hakkımda</a>
+  <a href="#yayin-duzeni">Yayın Düzeni</a>
+  <a href="#program">Program</a>
+  <a href="#kurallar">Kurallar</a>
+  <a href="#cs-ayarlari">CS Ayarları</a>
+  <a href="#pc-ozellikleri">Ekipman</a>
+  <a href="#destek" style="color:var(--kick);">Destek Ol!</a>
+</div>
+
+<!-- HERO -->
+<div id="hero">
+  <div class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-inner">
+      <div class="hero-badge">Kick Yayıncısı — Canlı</div>
+      <h1>WIBL<span class="accent">EGON</span></h1>
+      <p class="hero-sub">Erciyes'li endüstri mühendisi, can sıkıntısını yayına döken adam.</p>
+      <div class="hero-ctas">
+        <a href="https://kick.com/wiblegon" target="_blank" class="btn btn-primary">
+          ▶ Yayına Git
+        </a>
+        <a href="#hakkimda" class="btn btn-outline">Daha Fazla Keşfet</a>
+      </div>
+      <div class="scroll-hint">Aşağı Kaydır</div>
+    </div>
+  </div>
+</div>
+
+<main>
+  <!-- HAKKIMDA -->
+  <section id="hakkimda" class="fade-in">
+    <div class="section-label">01 — Hakkımda</div>
+    <h2 class="section-title">Ben Kimim?</h2>
+    <div class="content-grid">
+      <div class="about-text">
+        <p>Merhaba, öncelikle siteme girdiğin için teşekkür ederim. Ben <strong style="color:#fff">Arda, Mehmet Arda.</strong> Erciyes Üniversitesinde öğrencisiyim, Endüstri okuyorum ve can sıkıntısından oyun oynayıp, yayın açıyorum.</p>
+        <p>Ne zaman ki buradan para kazanmaya başlayayım o zaman tam zamanlı yayıncı olabilirim. Bana destek olmak istiyorsan Kick'ten bana abone olabilir, beni başkalarına önerebilir, bağış yapabilirsin.</p>
+        <p>Bağış linkine direkt yayının altındaki linkten veya bu sitede yer alan <strong style="color:var(--kick)">"Bana Destek Ol!"</strong> kısmından bağış yapabilirsin. Şimdiden teşekkürler!</p>
+      </div>
+      <div class="about-aside">
+        <div class="stat-card">
+          <div class="stat-label">Üniversite</div>
+          <div class="stat-value">Erciyes Üniversitesi</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Bölüm</div>
+          <div class="stat-value">Endüstri Mühendisliği</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Platform</div>
+          <div class="stat-value">Kick.com/wiblegon</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Durum</div>
+          <div class="stat-value">Part-Time Yayıncı</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- YAYIN DÜZENİ -->
+  <section id="yayin-duzeni" class="fade-in">
+    <div class="section-label">02 — Yayın Düzeni</div>
+    <h2 class="section-title">Ekranda Ne Var?</h2>
+    <div class="layout-cards">
+      <div class="layout-card">
+        <div class="layout-card-icon" style="color:var(--kick)">📊</div>
+        <h3>Üstteki Barlar</h3>
+        <p><strong style="color:#8ab5e8">Mavi bar</strong> haftalık takipçi hedefini, <strong style="color:#ff6b6b">kırmızı bar</strong> ise haftalık abone hedefini gösteriyor. İlerlemeyi canlı olarak takip edebilirsin.</p>
+      </div>
+      <div class="layout-card">
+        <div class="layout-card-icon" style="color:var(--kick)">💬</div>
+        <h3>Kamera Altı</h3>
+        <p>Kameramın altında sohbet (chat) yer alıyor. Uygun anlarda bağış, takipçi, abone, host gibi bildiriler de görünüyor.</p>
+      </div>
+      <div class="layout-card">
+        <div class="layout-card-icon" style="color:var(--kick)">🎯</div>
+        <h3>Kamera Üstü</h3>
+        <p>Kameramın üstünde son takipçi, anlık izleyici sayısı ve emoji kombosu gibi bilgiler yer alıyor. Her şeyi bir bakışta görürsün.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- HAFTALIK PROGRAM -->
+  <section id="program" class="fade-in">
+    <div class="section-label">03 — Haftalık Program</div>
+    <h2 class="section-title">Yayın Takvimi</h2>
+    <div class="schedule-grid">
+      <div class="day-card active">
+        <div class="day-name">Pzt</div>
+        <div class="day-time">20:30<br>—<br>23:30</div>
+      </div>
+      <div class="day-card active">
+        <div class="day-name">Sal</div>
+        <div class="day-time">20:30<br>—<br>23:30</div>
+      </div>
+      <div class="day-card active">
+        <div class="day-name">Çar</div>
+        <div class="day-time">20:30<br>—<br>23:30</div>
+      </div>
+      <div class="day-card off">
+        <div class="day-name">Per</div>
+        <div class="day-time">Yok</div>
+      </div>
+      <div class="day-card active">
+        <div class="day-name">Cum</div>
+        <div class="day-time">20:30<br>—<br>23:30</div>
+      </div>
+      <div class="day-card active">
+        <div class="day-name">Cmt</div>
+        <div class="day-time">20:30<br>—<br>23:30</div>
+      </div>
+      <div class="day-card active">
+        <div class="day-name">Paz</div>
+        <div class="day-time">20:30<br>—<br>23:30</div>
+      </div>
+    </div>
+    <div class="schedule-note">
+      Yayın saatleri ve günleri, aksilikler veya programdaki değişiklikler nedeniyle önceden haber vermeksizin değişebilir. Güncel bilgi için sosyal medya hesaplarımı takip etmenizi öneririm!
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- KURALLAR -->
+  <section id="kurallar" class="fade-in">
+    <div class="section-label">04 — Kurallar</div>
+    <h2 class="section-title">Chat Kuralları</h2>
+    <div class="rules-list">
+      <div class="rule-item">
+        <div class="rule-num">01</div>
+        <div class="rule-content">
+          <h3>Küfür — Dozunda Özgür</h3>
+          <p>Yerinde ve dozunda edildiği sürece küfür şiir gibidir, serbesttir. Ancak <strong style="color:var(--red)">ailevi değerlere küfür kesinlikle kırmızı çizgimizdir</strong> ve yasaktır.</p>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">02</div>
+        <div class="rule-content">
+          <h3>Kavga & Gerginlik Yok</h3>
+          <p>Chat'te başka izleyicilerle kavga etmek ya da ortamı germek kesinlikle yasak. Herkes burada iyi vakit geçirmek için.</p>
+        </div>
+      </div>
+      <div class="rule-item">
+        <div class="rule-num">03</div>
+        <div class="rule-content">
+          <h3>Spoiler Yasak!</h3>
+          <p>Oyunlarda spoiler vermek kesinlikle yasaktır. Herkesin sürprizi yaşamasına izin verelim.</p>
+        </div>
+      </div>
+      <div class="rule-item special">
+        <div class="rule-num">✌</div>
+        <div class="rule-content">
+          <h3>Başka Kural Yok — Kafanıza Göre</h3>
+          <p>Asıl amacımız iyi vakit geçirmek. Arkanıza yaslanın ve yayının tadını çıkarın. Bu basit. 🎮</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- CS AYARLARI -->
+  <section id="cs-ayarlari" class="fade-in">
+    <div class="section-label">05 — CS Ayarları</div>
+    <h2 class="section-title">CS2 Konfigürasyonu</h2>
+    <div class="cs-grid">
+
+      <div class="cs-card">
+        <div class="cs-card-header">
+          <div class="dot"></div>
+          <h3>Viewmodel</h3>
+        </div>
+        <div class="cs-card-body">
+          <div class="cs-row">
+            <span class="cs-key">Preset</span>
+            <span class="cs-val">— değiştir —</span>
+          </div>
+          <div class="cs-row">
+            <span class="cs-key">FOV</span>
+            <span class="cs-val">— değiştir —</span>
+          </div>
+          <div class="cs-row">
+            <span class="cs-key">Offset X</span>
+            <span class="cs-val">— değiştir —</span>
+          </div>
+          <div class="cs-row">
+            <span class="cs-key">Offset Y</span>
+            <span class="cs-val">— değiştir —</span>
+          </div>
+          <div class="cs-row">
+            <span class="cs-key">Offset Z</span>
+            <span class="cs-val">— değiştir —</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cs-card">
+        <div class="cs-card-header">
+          <div class="dot"></div>
+          <h3>Crosshair</h3>
+        </div>
+        <div class="cs-card-body">
+          <div class="cs-row">
+            <span class="cs-key">Stil</span>
+            <span class="cs-val">— değiştir —</span>
+          </div>
+          <div class="cs-row">
+            <span class="cs-key">Boyut</span>
+            <span class="cs-val">— değiştir —</span>
+          </div>
+          <div class="cs-row">
+            <span class="cs-key">Kalınlık</span>
+            <span class="cs-val">— değiştir —</span>
+          </div>
+          <div class="cs-row">
+            <span class="cs-key">Boşluk</span>
+            <span class="cs-val">— değiştir —</span>
+          </div>
+          <div class="cs-row">
+            <span class="cs-key">Renk</span>
+            <span class="cs-val">— değiştir —</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cs-card">
+        <div class="cs-card-header">
+          <div class="dot"></div>
+          <h3>Görüntü & Grafik</h3>
+        </div>
+        <div class="cs-card-body">
+          <div class="cs-row">
+            <span class="cs-key">Çözünürlük</span>
+            <span class="cs-val">— değiştir —</span>
+          </div>
+          <div class="cs-row">
+            <span class="cs-key">Oran</span>
+            <span class="cs-val">— değiştir —</span>
+          </div>
+          <div class="cs-row">
+            <span class="cs-key">Grafik Kalitesi</span>
+            <span class="cs-val">— değiştir —</span>
+          </div>
+          <div class="cs-row">
+            <span class="cs-key">Shader</span>
+            <span class="cs-val">— değiştir —</span>
+          </div>
+          <div class="cs-row">
+            <span class="cs-key">V-Sync</span>
+            <span class="cs-val">— değiştir —</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cs-card">
+        <div class="cs-card-header">
+          <div class="dot"></div>
+          <h3>Klavye & Fare</h3>
+        </div>
+        <div class="cs-card-body">
+          <div class="cs-row">
+            <span class="cs-key">DPI</span>
+            <span class="cs-val">— değiştir —</span>
+          </div>
+          <div class="cs-row">
+            <span class="cs-key">Oyun Hassasiyeti</span>
+            <span class="cs-val">— değiştir —</span>
+          </div>
+          <div class="cs-row">
+            <span class="cs-key">eDPI</span>
+            <span class="cs-val">— değiştir —</span>
+          </div>
+          <div class="cs-row">
+            <span class="cs-key">Hz (Polling)</span>
+            <span class="cs-val">— değiştir —</span>
+          </div>
+          <div class="cs-row">
+            <span class="cs-key">Ham Girdi</span>
+            <span class="cs-val">— değiştir —</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cs-card" style="grid-column: 1 / -1">
+        <div class="cs-card-header">
+          <div class="dot"></div>
+          <h3>Ekstra Bind'lar (Konsol / Autoexec)</h3>
+        </div>
+        <div class="cs-card-body">
+          <div class="cs-row">
+            <span class="cs-key">Bind 1</span>
+            <span class="cs-val">— değiştir —</span>
+          </div>
+          <div class="cs-row">
+            <span class="cs-key">Bind 2</span>
+            <span class="cs-val">— değiştir —</span>
+          </div>
+          <div class="cs-row">
+            <span class="cs-key">Bind 3</span>
+            <span class="cs-val">— değiştir —</span>
+          </div>
+          <div class="cs-row">
+            <span class="cs-key">Bind 4</span>
+            <span class="cs-val">— değiştir —</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- PC ÖZELLİKLERİ -->
+  <section id="pc-ozellikleri" class="fade-in">
+    <div class="section-label">06 — Ekipman</div>
+    <h2 class="section-title">PC & Ekipmanlarım</h2>
+    <div class="pc-grid">
+      <div class="pc-item">
+        <div class="pc-icon">💻</div>
+        <div class="pc-item-label">Laptop / PC</div>
+        <div class="pc-item-value placeholder">— buraya yaz —</div>
+      </div>
+      <div class="pc-item">
+        <div class="pc-icon">🖥️</div>
+        <div class="pc-item-label">Monitör</div>
+        <div class="pc-item-value placeholder">— buraya yaz —</div>
+      </div>
+      <div class="pc-item">
+        <div class="pc-icon">🎧</div>
+        <div class="pc-item-label">Kulaklık</div>
+        <div class="pc-item-value placeholder">— buraya yaz —</div>
+      </div>
+      <div class="pc-item">
+        <div class="pc-icon">🎙️</div>
+        <div class="pc-item-label">Mikrofon</div>
+        <div class="pc-item-value placeholder">— buraya yaz —</div>
+      </div>
+      <div class="pc-item">
+        <div class="pc-icon">🖱️</div>
+        <div class="pc-item-label">Mouse</div>
+        <div class="pc-item-value placeholder">— buraya yaz —</div>
+      </div>
+      <div class="pc-item">
+        <div class="pc-icon">⌨️</div>
+        <div class="pc-item-label">Klavye</div>
+        <div class="pc-item-value placeholder">— buraya yaz —</div>
+      </div>
+      <div class="pc-item">
+        <div class="pc-icon">📷</div>
+        <div class="pc-item-label">Kamera</div>
+        <div class="pc-item-value placeholder">— buraya yaz —</div>
+      </div>
+      <div class="pc-item">
+        <div class="pc-icon">📡</div>
+        <div class="pc-item-label">İnternet</div>
+        <div class="pc-item-value placeholder">— buraya yaz —</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- DESTEK -->
+  <section id="destek" class="fade-in">
+    <div class="support-card">
+      <h2>🚀 Bana Destek Ol!</h2>
+      <p>Yayınlarımı seviyorsan abone olarak, takip ederek veya bağış yaparak tam zamanlı yayıncı olmama destek olabilirsin. Her destek gerçekten fark yaratıyor!</p>
+      <div class="support-actions">
+        <a href="https://kick.com/wiblegon" target="_blank" class="btn btn-primary">
+          💚 Kick'te Abone Ol
+        </a>
+        <a href="https://kick.com/wiblegon" target="_blank" class="btn btn-outline">
+          💸 Bağış Yap
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo">WIBLEGON</div>
+        <p>Beni diğer sosyal medya hesaplarımdan takip etmeyi unutmayın! Her platformda aktifim ve yayın duyurularını orada paylaşıyorum. Görüşürüz! 🎮</p>
+      </div>
+      <div class="footer-social">
+        <h4>Sosyal Medya & İletişim</h4>
+        <div class="social-links">
+          <a href="https://kick.com/wiblegon" target="_blank" class="social-link">
+            <span class="social-platform">Kick</span>
+            kick.com/wiblegon
+          </a>
+          <a href="https://www.instagram.com/wiblegon/" target="_blank" class="social-link">
+            <span class="social-platform">Instagram</span>
+            @wiblegon
+          </a>
+          <a href="https://www.youtube.com/@wiblegon" target="_blank" class="social-link">
+            <span class="social-platform">YouTube</span>
+            @wiblegon
+          </a>
+          <a href="https://www.tiktok.com/@wiblegon" target="_blank" class="social-link">
+            <span class="social-platform">TikTok</span>
+            @wiblegon
+          </a>
+          <div class="social-link" style="cursor:default">
+            <span class="social-platform">Discord</span>
+            Yakında!
+            <span class="social-badge">Tadilatta</span>
+          </div>
+        </div>
+        <div class="footer-email">
+          <span>İş Birliği</span>
+          contact.wiblegon@gmail.com
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 <strong>Wiblegon</strong>. Tüm hakları saklıdır.</p>
+      <p style="font-size:0.8rem">Made with 💚 for Kick</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const cursorRing = document.getElementById('cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+
+  function animRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    cursorRing.style.left = rx + 'px';
+    cursorRing.style.top = ry + 'px';
+    requestAnimationFrame(animRing);
+  }
+  animRing();
+
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.width = '14px';
+      cursor.style.height = '14px';
+      cursorRing.style.width = '40px';
+      cursorRing.style.height = '40px';
+      cursorRing.style.borderColor = 'rgba(83,252,24,0.8)';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.width = '8px';
+      cursor.style.height = '8px';
+      cursorRing.style.width = '28px';
+      cursorRing.style.height = '28px';
+      cursorRing.style.borderColor = 'rgba(83,252,24,0.5)';
+    });
+  });
+
+  // Hamburger
+  const hamburger = document.getElementById('hamburger');
+  const mobileNav = document.getElementById('mobileNav');
+  hamburger.addEventListener('click', () => {
+    mobileNav.classList.toggle('open');
+  });
+
+  mobileNav.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => mobileNav.classList.remove('open'));
+  });
+
+  // Scroll animations
+  const fadeEls = document.querySelectorAll('.fade-in');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08 });
+
+  fadeEls.forEach(el => observer.observe(el));
+
+  // Active nav highlight
+  const sections = document.querySelectorAll('section[id], div[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 100) {
+        current = s.getAttribute('id');
+      }
+    });
+    navLinks.forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) {
+        a.classList.add('active');
+      }
+    });
+  });
+</script>
+</body>
+</html>
