@@ -4,23 +4,29 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wiblegon — Kick</title>
+<!-- Logo_Ham.png dosyasını bu HTML ile aynı klasöre koy -->
+<link rel="icon" href="Logo_Ham.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:     #0b0b0b;
-  --bg2:    #131313;
-  --bg3:    #1b1b1b;
-  --line:   rgba(255,255,255,0.07);
-  --lineh:  rgba(255,255,255,0.14);
-  --t1:     #ededed;
-  --t2:     #888;
-  --t3:     #444;
-  --green:  #5dba6e;
-  --fh:     'Syne', sans-serif;
-  --fb:     'DM Sans', sans-serif;
-  --fm:     'JetBrains Mono', monospace;
+  --bg:      #0b0b0b;
+  --bg2:     #141414;
+  --bg3:     #1e1e1e;
+  --line:    rgba(255,255,255,0.08);
+  --lineh:   rgba(255,255,255,0.18);
+  --t1:      #f2f2f2;
+  --t2:      #b4b4b4;
+  --t3:      #717171;
+  --t4:      #444;
+  --acc:     #c0806a;
+  --acc2:    rgba(192,128,106,0.14);
+  --acc3:    rgba(192,128,106,0.06);
+  --green:   #5dba6e;
+  --fh:      'Syne', sans-serif;
+  --fb:      'DM Sans', sans-serif;
+  --fm:      'JetBrains Mono', monospace;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -37,55 +43,73 @@ body {
 }
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--bg3); }
+::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 3px; }
 
-/* CURSOR */
+/* ─── CURSOR ─── */
 #cur {
   position: fixed; top: 0; left: 0;
-  width: 5px; height: 5px;
-  background: var(--t1); border-radius: 50%;
+  width: 6px; height: 6px;
+  background: var(--acc);
+  border-radius: 50%;
   pointer-events: none; z-index: 9999;
   transform: translate(-50%,-50%);
-  transition: width .18s, height .18s, background .18s, border .18s;
+  transition: width .18s, height .18s, background .18s;
 }
 #cur.big {
-  width: 30px; height: 30px;
+  width: 28px; height: 28px;
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.3);
+  border: 1.5px solid var(--acc);
+  opacity: .7;
 }
 
-/* NAV */
+/* ─── NAV ─── */
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 900;
-  height: 56px;
-  display: flex; align-items: center; justify-content: space-between;
+  height: 58px;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
   padding: 0 2.5rem;
-  background: rgba(11,11,11,0.88);
-  backdrop-filter: blur(14px);
+  background: rgba(11,11,11,0.9);
+  backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--line);
 }
 .nav-logo {
+  display: flex; align-items: center; gap: .6rem;
+  text-decoration: none;
+}
+.nav-logo img {
+  width: 26px; height: 26px;
+  object-fit: contain;
+  opacity: .9;
+  filter: brightness(.85) saturate(1.1);
+}
+.nav-logo span {
   font-family: var(--fh); font-size: .95rem; font-weight: 800;
-  letter-spacing: .06em; text-decoration: none; color: var(--t1);
-  text-transform: uppercase;
+  letter-spacing: .06em; color: var(--t1); text-transform: uppercase;
 }
 .nav-links { display: flex; gap: 0; list-style: none; }
 .nav-links a {
-  display: block; padding: .3rem .8rem;
-  font-family: var(--fb); font-size: .75rem; font-weight: 500;
-  letter-spacing: .04em; color: var(--t2);
+  display: block; padding: .3rem .78rem;
+  font-family: var(--fb); font-size: .74rem; font-weight: 500;
+  letter-spacing: .04em; color: var(--t3);
   text-decoration: none; text-transform: uppercase;
-  border-radius: 4px; transition: color .2s; white-space: nowrap;
+  border-radius: 3px; transition: color .2s; white-space: nowrap;
 }
-.nav-links a:hover, .nav-links a.on { color: var(--t1); }
-.nav-links a.cta { color: var(--t1); }
+.nav-links a:hover { color: var(--t1); }
+.nav-links a.on { color: var(--acc); }
+.nav-links a.cta {
+  color: var(--acc); border: 1px solid rgba(192,128,106,0.3);
+  margin-left: .3rem;
+}
+.nav-links a.cta:hover { background: var(--acc2); }
+
+/* hamburger */
 .ham {
   display: none; flex-direction: column; gap: 5px;
   background: none; border: none; cursor: none; padding: 4px;
 }
 .ham span { display: block; width: 20px; height: 1.5px; background: var(--t2); transition: .3s; }
 .mnav {
-  display: none; position: fixed; top: 56px; left: 0; right: 0; z-index: 800;
+  display: none; position: fixed; top: 58px; left: 0; right: 0; z-index: 800;
   background: rgba(11,11,11,0.97); border-bottom: 1px solid var(--line);
   padding: .75rem 2rem 1rem; flex-direction: column; gap: .1rem;
 }
@@ -97,183 +121,261 @@ nav {
 }
 .mnav a:hover { color: var(--t1); }
 
-/* HERO */
+/* ─── HERO ─── */
 .hero {
   min-height: 100vh;
   display: flex; flex-direction: column;
   align-items: flex-start; justify-content: flex-end;
   padding: 140px 2.5rem 5rem;
   border-bottom: 1px solid var(--line);
+  position: relative;
+  overflow: hidden;
 }
-.live-tag {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-family: var(--fb); font-size: .72rem; font-weight: 500;
-  letter-spacing: .1em; text-transform: uppercase;
-  color: var(--t2); margin-bottom: 2rem;
+/* subtle accent glow top-right */
+.hero::after {
+  content: '';
+  position: absolute; top: -120px; right: -120px;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(192,128,106,0.07) 0%, transparent 65%);
+  pointer-events: none;
 }
-.live-tag::before {
-  content: ''; width: 6px; height: 6px; border-radius: 50%;
-  background: var(--green);
-  animation: blink 2.5s ease-in-out infinite;
-}
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
 .hero h1 {
   font-family: var(--fh);
   font-size: clamp(4.5rem, 13vw, 10rem);
   font-weight: 800; line-height: .9;
   letter-spacing: -.03em; color: var(--t1); margin-bottom: 2rem;
+  position: relative;
 }
+/* accent underline on last letter group */
+.hero h1 .acc-word { color: var(--acc); }
+
 .hero-meta {
   display: flex; align-items: center; gap: 2.5rem; flex-wrap: wrap;
   border-top: 1px solid var(--line); padding-top: 1.5rem; width: 100%;
 }
 .hmi { display: flex; flex-direction: column; gap: 2px; }
-.hmi .lbl { font-size: .65rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--t3); }
-.hmi .val { font-family: var(--fb); font-size: .88rem; color: var(--t2); font-weight: 400; }
+.hmi .lbl { font-size: .64rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--t4); }
+.hmi .val { font-family: var(--fb); font-size: .9rem; color: var(--t2); font-weight: 400; }
 .hero-ctas { margin-left: auto; display: flex; gap: .75rem; flex-wrap: wrap; align-items: center; }
 
-/* BUTTONS */
+/* ─── BUTTONS ─── */
 .btn {
-  display: inline-block; padding: .58rem 1.4rem;
-  font-family: var(--fb); font-size: .76rem;
-  font-weight: 500; letter-spacing: .04em; text-transform: uppercase;
+  display: inline-block; padding: .6rem 1.4rem;
+  font-family: var(--fb); font-size: .76rem; font-weight: 500;
+  letter-spacing: .04em; text-transform: uppercase;
   text-decoration: none; border-radius: 4px; border: 1px solid;
-  transition: background .2s, color .2s, border-color .2s;
+  transition: background .2s, color .2s, border-color .2s, transform .15s;
 }
-.btn-fill { background: var(--t1); color: #0b0b0b; border-color: var(--t1); }
-.btn-fill:hover { background: #d0d0d0; border-color: #d0d0d0; }
+.btn:hover { transform: translateY(-1px); }
+.btn-fill { background: var(--acc); color: #0b0b0b; border-color: var(--acc); }
+.btn-fill:hover { background: #ca8e78; border-color: #ca8e78; }
 .btn-ghost { background: transparent; color: var(--t2); border-color: var(--lineh); }
-.btn-ghost:hover { color: var(--t1); border-color: rgba(255,255,255,0.35); }
+.btn-ghost:hover { color: var(--t1); border-color: var(--t2); }
 
-/* WRAP + SECTION */
+/* ─── WRAP / SECTION ─── */
 .wrap { max-width: 1040px; margin: 0 auto; padding: 0 2.5rem; }
 section { padding: 6rem 0; border-bottom: 1px solid var(--line); }
 .sh { display: flex; align-items: baseline; gap: 1.25rem; margin-bottom: 3rem; }
-.snum { font-family: var(--fm); font-size: .67rem; color: var(--t3); letter-spacing: .06em; flex-shrink: 0; padding-top: 3px; }
-.stitle { font-family: var(--fh); font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 700; color: var(--t1); letter-spacing: -.02em; line-height: 1.1; }
+.snum { font-family: var(--fm); font-size: .66rem; color: var(--acc); letter-spacing: .06em; flex-shrink: 0; padding-top: 3px; opacity: .8; }
+.stitle { font-family: var(--fh); font-size: clamp(1.6rem,3.5vw,2.4rem); font-weight: 700; color: var(--t1); letter-spacing: -.02em; line-height: 1.1; }
 
-/* HAKKIMDA */
+/* ─── HAKKIMDA ─── */
 .about-g { display: grid; grid-template-columns: 1fr 272px; gap: 5rem; align-items: start; }
 .about-body p { color: var(--t2); font-size: 1rem; margin-bottom: 1rem; font-weight: 300; }
 .about-body p:last-child { margin-bottom: 0; }
 .about-body strong { color: var(--t1); font-weight: 500; }
 .info-list { display: flex; flex-direction: column; }
-.ir { display: flex; flex-direction: column; gap: 2px; padding: .7rem 0; border-bottom: 1px solid var(--line); }
+.ir { display: flex; flex-direction: column; gap: 3px; padding: .7rem 0; border-bottom: 1px solid var(--line); }
 .ir:first-child { border-top: 1px solid var(--line); }
-.ir .k { font-size: .62rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--t3); }
-.ir .v { font-size: .88rem; color: var(--t2); font-weight: 300; }
+.ir .k { font-size: .62rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--t4); }
+.ir .v { font-size: .9rem; color: var(--t2); font-weight: 300; }
 .sponsor-box {
-  margin-top: 2.5rem; padding: 1.5rem;
-  border: 1px solid var(--line); border-radius: 6px; background: var(--bg2);
+  margin-top: 2.5rem; padding: 1.5rem 1.6rem;
+  border: 1px solid var(--line); border-left: 2px solid var(--acc);
+  border-radius: 0 6px 6px 0; background: var(--bg2);
 }
-.sponsor-box .slbl { font-size: .62rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--t3); margin-bottom: .6rem; display: block; }
+.sponsor-box .slbl { font-size: .62rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--acc); margin-bottom: .55rem; display: block; opacity: .8; }
 .sponsor-box p { font-size: .9rem; color: var(--t2); font-weight: 300; line-height: 1.65; }
-.sponsor-box a { display: inline-block; margin-top: .7rem; font-size: .78rem; font-weight: 500; color: var(--t1); text-decoration: underline; text-underline-offset: 3px; letter-spacing: .02em; }
+.sponsor-box a { display: inline-block; margin-top: .7rem; font-size: .78rem; font-weight: 500; color: var(--acc); text-decoration: underline; text-underline-offset: 3px; letter-spacing: .02em; }
 
-/* YAYIN DUZENİ */
-.layout-cols { display: grid; grid-template-columns: repeat(3,1fr); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
-.lcol { padding: 1.75rem; border-right: 1px solid var(--line); }
+/* ─── YAYIN DÜZENİ ─── */
+.layout-cols { display: grid; grid-template-columns: repeat(3,1fr); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.lcol { padding: 1.75rem; border-right: 1px solid var(--line); position: relative; }
+.lcol::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--acc); opacity: 0; transition: opacity .2s; }
+.lcol:hover::before { opacity: 1; }
 .lcol:last-child { border-right: none; }
-.lcol .ltag { font-size: .62rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--t3); margin-bottom: .7rem; display: block; }
+.lcol .ltag { font-size: .6rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--t4); margin-bottom: .7rem; display: block; }
 .lcol h3 { font-family: var(--fh); font-size: 1rem; font-weight: 700; color: var(--t1); margin-bottom: .55rem; letter-spacing: -.01em; }
 .lcol p { font-size: .88rem; color: var(--t2); line-height: 1.65; font-weight: 300; }
 
-/* PROGRAM */
+/* ─── PROGRAM ─── */
 .sched-tbl { width: 100%; border-collapse: collapse; }
-.sched-tbl th { font-size: .62rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--t3); padding: .5rem .75rem; text-align: left; border-bottom: 1px solid var(--line); }
+.sched-tbl th { font-size: .62rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--t4); padding: .5rem .75rem; text-align: left; border-bottom: 1px solid var(--line); }
 .sched-tbl td { padding: .8rem .75rem; font-size: .9rem; color: var(--t2); border-bottom: 1px solid var(--line); font-weight: 300; }
 .sched-tbl tr:last-child td { border-bottom: none; }
-.sched-tbl .dc { font-family: var(--fh); font-weight: 600; color: var(--t1); font-size: .88rem; letter-spacing: -.01em; width: 140px; }
+.sched-tbl .dc { font-family: var(--fh); font-weight: 700; color: var(--t1); font-size: .88rem; letter-spacing: -.01em; width: 140px; }
 .sched-tbl .tc { font-family: var(--fm); font-size: .78rem; color: var(--t2); }
 .sched-tbl .sc { font-size: .65rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
 .sched-tbl tr.on .sc { color: var(--green); }
-.sched-tbl tr.off td { opacity: .35; }
+.sched-tbl tr.off td { opacity: .3; }
 .sched-tbl tr.off .dc { text-decoration: line-through; }
-.sched-tbl tr.off .sc { color: var(--t3); }
+.sched-tbl tr.off .sc { color: var(--t4); }
 .sched-note { margin-top: 1.5rem; padding: 1rem 1.25rem; border-left: 2px solid var(--bg3); font-size: .85rem; color: var(--t3); font-weight: 300; line-height: 1.65; }
 
-/* KURALLAR */
+/* ─── KURALLAR ─── */
 .rules { display: flex; flex-direction: column; }
-.rule { display: grid; grid-template-columns: 48px 1fr; gap: 1.5rem; align-items: start; padding: 1.5rem 0; border-bottom: 1px solid var(--line); }
+.rule { display: grid; grid-template-columns: 48px 1fr; gap: 1.5rem; align-items: start; padding: 1.5rem 0; border-bottom: 1px solid var(--line); transition: background .2s; }
 .rule:first-child { border-top: 1px solid var(--line); }
-.rn { font-family: var(--fm); font-size: .68rem; color: var(--t3); padding-top: 3px; }
+.rule:hover { background: var(--acc3); margin: 0 -1rem; padding-left: 1rem; padding-right: 1rem; border-radius: 4px; }
+.rn { font-family: var(--fm); font-size: .68rem; color: var(--acc); padding-top: 3px; opacity: .7; }
 .rt h3 { font-family: var(--fh); font-size: 1rem; font-weight: 700; color: var(--t1); letter-spacing: -.01em; margin-bottom: .35rem; }
 .rt p { font-size: .9rem; color: var(--t2); font-weight: 300; line-height: 1.65; }
 
-/* CS AYARLARI */
+/* ─── CS AYARLARI ─── */
 .cs-blocks { display: flex; flex-direction: column; gap: 3rem; }
-.cs-block {}
 .cs-btitle { font-family: var(--fh); font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--t1); margin-bottom: .7rem; padding-bottom: .55rem; border-bottom: 1px solid var(--line); }
 .cs-tbl { width: 100%; border-collapse: collapse; }
-.cs-tbl td { padding: .5rem 0; border-bottom: 1px solid var(--line); font-size: .87rem; vertical-align: middle; }
+.cs-tbl td { padding: .48rem 0; border-bottom: 1px solid var(--line); font-size: .87rem; vertical-align: middle; }
 .cs-tbl tr:last-child td { border-bottom: none; }
-.cs-tbl .ck { color: var(--t2); font-weight: 300; width: 55%; }
+.cs-tbl .ck { color: var(--t2); font-weight: 300; width: 50%; }
 .cs-tbl .cv { font-family: var(--fm); font-size: .76rem; color: var(--t1); text-align: right; font-weight: 400; }
-.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+.cv-wrap { display: flex; align-items: center; justify-content: flex-end; gap: .5rem; }
+.cv-val { font-family: var(--fm); font-size: .76rem; color: var(--t1); }
 
-/* crosshair preview */
-.ch-prev {
-  display: flex; align-items: center; justify-content: center;
-  height: 76px; border: 1px solid var(--line); border-radius: 4px;
-  margin-bottom: .65rem; background: #141e1e; position: relative;
+/* COPY BUTTON */
+.copy-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: var(--fm); font-size: .6rem; font-weight: 500;
+  color: var(--t4); background: var(--bg3);
+  border: 1px solid var(--line); border-radius: 3px;
+  padding: 2px 7px; cursor: none;
+  transition: color .2s, border-color .2s, background .2s;
+  white-space: nowrap; flex-shrink: 0;
 }
-.chl { position: absolute; background: #00ffff; }
-.ch-h1 { width: 12px; height: 1px; top: 50%; left: 50%; transform: translate(-14px,-0.5px); }
-.ch-h2 { width: 12px; height: 1px; top: 50%; left: 50%; transform: translate(2px,-0.5px); }
-.ch-v1 { width: 1px; height: 12px; top: 50%; left: 50%; transform: translate(-0.5px,-14px); }
-.ch-v2 { width: 1px; height: 12px; top: 50%; left: 50%; transform: translate(-0.5px,2px); }
-.ch-lbl { font-family: var(--fm); font-size: .68rem; color: var(--t3); text-align: center; }
+.copy-btn:hover { color: var(--acc); border-color: var(--acc); background: var(--acc2); }
+.copy-btn.copied { color: var(--green); border-color: var(--green); background: rgba(93,186,110,0.1); }
+
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
 
 /* bind grid */
 .binds-g { display: grid; grid-template-columns: repeat(auto-fit,minmax(210px,1fr)); gap: 2.5rem; }
-.bg-title { font-size: .62rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--t3); margin-bottom: .6rem; display: block; }
-.bind-r { display: flex; justify-content: space-between; align-items: center; padding: .42rem 0; border-bottom: 1px solid var(--line); font-size: .85rem; }
+.bg-title { font-size: .62rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--t4); margin-bottom: .6rem; display: block; }
+.bind-r { display: flex; justify-content: space-between; align-items: center; padding: .45rem 0; border-bottom: 1px solid var(--line); font-size: .85rem; gap: .5rem; }
 .bind-r:last-child { border-bottom: none; }
-.bkey { font-family: var(--fm); font-size: .7rem; color: var(--t1); background: var(--bg3); padding: 2px 8px; border-radius: 3px; border: 1px solid var(--lineh); }
-.bval { font-size: .78rem; color: var(--t2); font-weight: 300; text-align: right; max-width: 160px; line-height: 1.4; }
+.bkey { font-family: var(--fm); font-size: .7rem; color: var(--t1); background: var(--bg3); padding: 2px 8px; border-radius: 3px; border: 1px solid var(--lineh); flex-shrink: 0; }
+.bval { font-size: .78rem; color: var(--t2); font-weight: 300; text-align: right; line-height: 1.4; flex: 1; }
 
-/* PC */
-.pc-g { display: grid; grid-template-columns: repeat(3,1fr); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
-.pci { padding: 1.5rem 1.35rem; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); transition: background .2s; }
+/* ─── PC ─── */
+.pc-g { display: grid; grid-template-columns: repeat(3,1fr); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.pci {
+  padding: 1.5rem 1.35rem;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  transition: background .2s;
+  position: relative; overflow: hidden;
+}
+.pci::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1.5px; background: var(--acc); transform: scaleX(0); transform-origin: left; transition: transform .3s; }
+.pci:hover::after { transform: scaleX(1); }
 .pci:hover { background: var(--bg2); }
 .pci:nth-child(3n) { border-right: none; }
 .pci:nth-last-child(-n+3) { border-bottom: none; }
-.pci .plbl { font-size: .6rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--t3); margin-bottom: .45rem; display: block; }
+.pci .plbl { font-size: .6rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--t4); margin-bottom: .45rem; display: block; }
 .pci .pname { font-family: var(--fh); font-size: .92rem; font-weight: 700; color: var(--t1); margin-bottom: .25rem; letter-spacing: -.01em; }
 .pci .pdet { font-size: .78rem; color: var(--t3); line-height: 1.55; font-weight: 300; }
 
-/* DESTEK */
-.support-s { padding: 6rem 0; border-bottom: 1px solid var(--line); text-align: center; }
-.support-s .slbl { font-size: .68rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--t3); margin-bottom: 1.25rem; }
+/* ─── SOSYAL MEDYA ─── */
+.social-intro { font-size: 1rem; color: var(--t2); font-weight: 300; max-width: 520px; margin-bottom: 2.5rem; line-height: 1.7; }
+
+.soc-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+
+.soc-card {
+  background: var(--bg);
+  padding: 1.75rem;
+  text-decoration: none;
+  display: flex; flex-direction: column; gap: .5rem;
+  position: relative; overflow: hidden;
+  transition: background .2s;
+}
+.soc-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--platform-color, var(--acc));
+  transform: scaleX(0); transform-origin: left; transition: transform .3s;
+}
+.soc-card:hover::before { transform: scaleX(1); }
+.soc-card:hover { background: var(--bg2); }
+.soc-card.disabled { pointer-events: none; opacity: .5; }
+
+.soc-plat {
+  font-size: .62rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--t4);
+}
+.soc-handle {
+  font-family: var(--fh); font-size: 1.05rem; font-weight: 700;
+  color: var(--t1); letter-spacing: -.01em;
+}
+.soc-desc { font-size: .82rem; color: var(--t3); font-weight: 300; }
+.soc-arr {
+  margin-top: auto; font-size: .8rem; color: var(--t4);
+  transition: color .2s, transform .2s; display: inline-block;
+}
+.soc-card:hover .soc-arr { color: var(--platform-color, var(--acc)); transform: translateX(3px); }
+
+.email-card {
+  margin-top: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--line); border-radius: 6px;
+  background: var(--bg2);
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+}
+.email-card .ec-label {
+  font-size: .62rem; font-weight: 500; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--t4); display: block; margin-bottom: 4px;
+}
+.email-card .ec-addr { font-family: var(--fm); font-size: .85rem; color: var(--t1); }
+.email-card a.btn { flex-shrink: 0; }
+
+/* ─── DESTEK ─── */
+.support-s { padding: 6rem 0; border-bottom: 1px solid var(--line); text-align: center; position: relative; overflow: hidden; }
+.support-s::before {
+  content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  width: 600px; height: 300px;
+  background: radial-gradient(ellipse, rgba(192,128,106,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+.support-s .slbl { font-size: .68rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--acc); margin-bottom: 1.25rem; opacity: .8; }
 .support-s h2 { font-family: var(--fh); font-size: clamp(2rem,5vw,3.5rem); font-weight: 800; color: var(--t1); letter-spacing: -.03em; line-height: 1.05; margin-bottom: 1.25rem; }
-.support-s p { font-size: 1rem; color: var(--t2); font-weight: 300; max-width: 440px; margin: 0 auto 2.25rem; line-height: 1.7; }
+.support-s p { font-size: 1rem; color: var(--t2); font-weight: 300; max-width: 420px; margin: 0 auto 2.25rem; line-height: 1.7; }
 .support-btns { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
 
-/* FOOTER */
+/* ─── FOOTER ─── */
 footer { padding: 4rem 0 2.5rem; }
 .foot-g { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; margin-bottom: 3rem; }
-.fl-name { font-family: var(--fh); font-size: 1.05rem; font-weight: 800; letter-spacing: .04em; color: var(--t1); text-transform: uppercase; margin-bottom: .7rem; }
+.foot-logo { display: flex; align-items: center; gap: .6rem; margin-bottom: .75rem; }
+.foot-logo img { width: 28px; height: 28px; object-fit: contain; opacity: .8; filter: brightness(.8); }
+.foot-logo span { font-family: var(--fh); font-size: 1rem; font-weight: 800; letter-spacing: .04em; color: var(--t1); text-transform: uppercase; }
 .foot-g p { font-size: .88rem; color: var(--t3); font-weight: 300; line-height: 1.65; max-width: 330px; }
-.fr-title { font-size: .62rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--t3); margin-bottom: 1rem; display: block; }
-.soc-list { display: flex; flex-direction: column; }
-.soc-r { display: flex; align-items: center; gap: .75rem; padding: .58rem 0; border-bottom: 1px solid var(--line); text-decoration: none; transition: color .2s; color: var(--t2); }
-.soc-r:first-child { border-top: 1px solid var(--line); }
-.soc-r:hover { color: var(--t1); }
-.soc-r .sp { font-size: .62rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--t3); min-width: 68px; transition: color .2s; }
-.soc-r:hover .sp { color: var(--t2); }
-.soc-r .sh { font-size: .88rem; font-weight: 300; }
-.soc-r .badge { margin-left: auto; font-size: .58rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--t3); border: 1px solid var(--lineh); padding: 2px 7px; border-radius: 3px; }
-.email-r { display: flex; align-items: center; gap: .75rem; padding: .58rem 0; font-size: .88rem; }
-.email-r .ep { font-size: .62rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--t3); min-width: 68px; }
-.email-r .ea { color: var(--t2); font-weight: 300; }
 .foot-bot { border-top: 1px solid var(--line); padding-top: 1.5rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: .5rem; }
-.foot-bot p { font-size: .76rem; color: var(--t3); font-weight: 300; }
+.foot-bot p { font-size: .76rem; color: var(--t4); font-weight: 300; }
 
-/* REVEAL */
-.reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+.mini-soc { display: flex; flex-direction: column; gap: .1rem; margin-top: 1.5rem; }
+.fr-title { font-size: .62rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--t4); margin-bottom: .75rem; display: block; }
+.mini-row {
+  display: flex; align-items: center; gap: .75rem; padding: .5rem 0;
+  border-bottom: 1px solid var(--line); text-decoration: none;
+  transition: color .2s; color: var(--t2);
+}
+.mini-row:first-child { border-top: 1px solid var(--line); }
+.mini-row:hover { color: var(--t1); }
+.mini-row .mp { font-size: .6rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--t4); min-width: 72px; transition: color .2s; }
+.mini-row:hover .mp { color: var(--t3); }
+.mini-row .mh { font-size: .88rem; font-weight: 300; }
+.mini-row .mbadge { margin-left: auto; font-size: .58rem; letter-spacing: .06em; text-transform: uppercase; color: var(--t4); border: 1px solid var(--lineh); padding: 2px 6px; border-radius: 3px; }
+
+/* ─── REVEAL ─── */
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
 .reveal.in { opacity: 1; transform: translateY(0); }
 
-/* RESPONSIVE */
+/* ─── RESPONSIVE ─── */
 @media(max-width:900px) {
   .about-g { grid-template-columns: 1fr; gap: 3rem; }
   .layout-cols { grid-template-columns: 1fr; }
@@ -286,6 +388,7 @@ footer { padding: 4rem 0 2.5rem; }
   .pci:nth-child(2n) { border-right: none; }
   .pci:nth-last-child(-n+3) { border-bottom: 1px solid var(--line); }
   .pci:nth-last-child(-n+2) { border-bottom: none; }
+  .soc-grid { grid-template-columns: repeat(2,1fr); }
 }
 @media(max-width:640px) {
   nav { padding: 0 1.25rem; }
@@ -300,6 +403,7 @@ footer { padding: 4rem 0 2.5rem; }
   .pc-g { grid-template-columns: 1fr 1fr; }
   footer { padding: 3rem 0 2rem; }
   .binds-g { grid-template-columns: 1fr; }
+  .soc-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -307,9 +411,12 @@ footer { padding: 4rem 0 2.5rem; }
 
 <div id="cur"></div>
 
-<!-- NAV -->
+<!-- ═══ NAV ═══ -->
 <nav>
-  <a href="#hero" class="nav-logo">Wiblegon</a>
+  <a href="#hero" class="nav-logo">
+    <img src="Logo_Ham.png" alt="Wiblegon Logo">
+    <span>Wiblegon</span>
+  </a>
   <ul class="nav-links">
     <li><a href="#hakkimda">Hakkımda</a></li>
     <li><a href="#yayin-duzeni">Yayın Düzeni</a></li>
@@ -317,6 +424,7 @@ footer { padding: 4rem 0 2.5rem; }
     <li><a href="#kurallar">Kurallar</a></li>
     <li><a href="#cs-ayarlari">CS Ayarları</a></li>
     <li><a href="#pc-ozellikleri">Ekipman</a></li>
+    <li><a href="#sosyal-medya">Sosyal Medya</a></li>
     <li><a href="#destek" class="cta">Destek Ol →</a></li>
   </ul>
   <button class="ham" id="ham" aria-label="Menü">
@@ -331,14 +439,14 @@ footer { padding: 4rem 0 2.5rem; }
   <a href="#kurallar">Kurallar</a>
   <a href="#cs-ayarlari">CS Ayarları</a>
   <a href="#pc-ozellikleri">Ekipman</a>
+  <a href="#sosyal-medya">Sosyal Medya</a>
   <a href="#destek">Destek Ol</a>
 </div>
 
-<!-- HERO -->
+<!-- ═══ HERO ═══ -->
 <div id="hero">
   <div class="hero">
-    <div class="live-tag">Kick'te Yayındayım</div>
-    <h1>Wibl<br>egon.</h1>
+    <h1>Wiblegon<span class="acc-word">.</span></h1>
     <div class="hero-meta">
       <div class="hmi">
         <span class="lbl">Okul</span>
@@ -362,7 +470,7 @@ footer { padding: 4rem 0 2.5rem; }
 
 <main>
 
-<!-- HAKKIMDA -->
+<!-- ═══ HAKKIMDA ═══ -->
 <section id="hakkimda">
   <div class="wrap reveal">
     <div class="sh"><span class="snum">01</span><h2 class="stitle">Hakkımda</h2></div>
@@ -370,7 +478,7 @@ footer { padding: 4rem 0 2.5rem; }
       <div class="about-body">
         <p>Merhaba, öncelikle siteme girdiğin için teşekkür ederim. Ben <strong>Arda, Mehmet Arda.</strong> Erciyes Üniversitesi'nde Endüstri Mühendisliği okuyorum ve can sıkıntısından oyun oynayıp yayın açıyorum.</p>
         <p>Ne zaman ki buradan geçimimi sağlayabilecek kadar gelir elde edebileceğim, o zaman tam zamanlı yayıncı olabilirim. Bana destek olmak istiyorsan Kick'ten abone olabilir, beni başkalarına önerebilir ya da bağış yapabilirsin.</p>
-        <p>Bağış linkine yayının altındaki bağlantıdan veya bu sayfadaki <strong>"Destek Ol"</strong> bölümünden kolayca ulaşabilirsin. Şimdiden çok teşekkürler!</p>
+        <p>Bağış linkine yayının altındaki bağlantıdan veya bu sayfadaki <strong>"Destek Ol"</strong> bölümünden kolayca ulaşabilirsin. Şimdiden teşekkürler!</p>
         <div class="sponsor-box">
           <span class="slbl">İş Birliği & Sponsorluk</span>
           <p>Sponsorluk ve işbirliklerine her zaman açığım. Eğer ilgilenirseniz, bana aşağıdaki gmail adresinden ulaşabilirsiniz.</p>
@@ -382,13 +490,12 @@ footer { padding: 4rem 0 2.5rem; }
         <div class="ir"><span class="k">Bölüm</span><span class="v">Endüstri Mühendisliği</span></div>
         <div class="ir"><span class="k">Platform</span><span class="v">Kick.com</span></div>
         <div class="ir"><span class="k">Kullanıcı Adı</span><span class="v">wiblegon</span></div>
-        <div class="ir"><span class="k">Statü</span><span class="v">Part-Time Yayıncı</span></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- YAYIN DÜZENİ -->
+<!-- ═══ YAYIN DÜZENİ ═══ -->
 <section id="yayin-duzeni">
   <div class="wrap reveal">
     <div class="sh"><span class="snum">02</span><h2 class="stitle">Yayın Düzeni</h2></div>
@@ -396,23 +503,23 @@ footer { padding: 4rem 0 2.5rem; }
       <div class="lcol">
         <span class="ltag">Ekran Üstü</span>
         <h3>Haftalık Hedefler</h3>
-        <p>Ekranın üstündeki <strong style="color:var(--t1)">mavi çubuk</strong> haftalık takipçi hedefini, <strong style="color:var(--t1)">kırmızı çubuk</strong> ise haftalık abone hedefini gösteriyor.</p>
+        <p>Ekranın üstündeki <strong style="color:var(--t1)">mavi çubuk</strong> haftalık takipçi hedefini, <strong style="color:var(--t1)">kırmızı çubuk</strong> ise haftalık abone hedefini gösteriyor. İlerlemeyi canlı takip edebilirsin.</p>
       </div>
       <div class="lcol">
         <span class="ltag">Kamera Altı</span>
-        <h3>Sohbet & Bildirimler</h3>
-        <p>Kameranın altında canlı chat yer alıyor. Uygun anlarda bağış, yeni takipçi, abone ve host bildirimleri de burada görünüyor.</p>
+        <h3>Sohbet Alanı</h3>
+        <p>Kameranın altında canlı chat yer alıyor. Kamera etrafındaki uygun konumlarda ise bağış, yeni takipçi, abone ve host gibi bildirimler görünüyor.</p>
       </div>
       <div class="lcol">
         <span class="ltag">Kamera Üstü</span>
         <h3>Anlık İstatistikler</h3>
-        <p>Son takipçi adı, anlık izleyici sayısı ve emoji kombosu kameranın üstünde yer alıyor. Her şeyi tek bakışta görebilirsin.</p>
+        <p>Son takipçi adı, anlık izleyici sayısı ve emoji kombosu kameranın üstünde yer alıyor. Her şeyi tek bakışta görürsün.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- HAFTALIK PROGRAM -->
+<!-- ═══ PROGRAM ═══ -->
 <section id="program">
   <div class="wrap reveal">
     <div class="sh"><span class="snum">03</span><h2 class="stitle">Haftalık Program</h2></div>
@@ -438,7 +545,7 @@ footer { padding: 4rem 0 2.5rem; }
   </div>
 </section>
 
-<!-- KURALLAR -->
+<!-- ═══ KURALLAR ═══ -->
 <section id="kurallar">
   <div class="wrap reveal">
     <div class="sh"><span class="snum">04</span><h2 class="stitle">Kurallar</h2></div>
@@ -475,111 +582,112 @@ footer { padding: 4rem 0 2.5rem; }
   </div>
 </section>
 
-<!-- CS AYARLARI -->
+<!-- ═══ CS AYARLARI ═══ -->
 <section id="cs-ayarlari">
   <div class="wrap reveal">
     <div class="sh"><span class="snum">05</span><h2 class="stitle">CS2 Ayarları</h2></div>
     <div class="cs-blocks">
 
+      <!-- Viewmodel + Radar -->
       <div class="g2">
-        <div class="cs-block">
+        <div>
           <div class="cs-btitle">Viewmodel</div>
           <table class="cs-tbl">
-            <tr><td class="ck">Preset</td><td class="cv">0</td></tr>
-            <tr><td class="ck">Offset X / Y / Z</td><td class="cv">2 / 2 / −2</td></tr>
-            <tr><td class="ck">FOV</td><td class="cv">60</td></tr>
-            <tr><td class="ck">Sol El Modu</td><td class="cv">Kapalı</td></tr>
+            <tr><td class="ck">Preset</td><td><div class="cv-wrap"><span class="cv-val">viewmodel_presetpos 0</span><button class="copy-btn" data-v="viewmodel_presetpos 0">copy</button></div></td></tr>
+            <tr><td class="ck">Offset X</td><td><div class="cv-wrap"><span class="cv-val">viewmodel_offset_x 2</span><button class="copy-btn" data-v="viewmodel_offset_x 2">copy</button></div></td></tr>
+            <tr><td class="ck">Offset Y</td><td><div class="cv-wrap"><span class="cv-val">viewmodel_offset_y 2</span><button class="copy-btn" data-v="viewmodel_offset_y 2">copy</button></div></td></tr>
+            <tr><td class="ck">Offset Z</td><td><div class="cv-wrap"><span class="cv-val">viewmodel_offset_z -2</span><button class="copy-btn" data-v="viewmodel_offset_z -2">copy</button></div></td></tr>
+            <tr><td class="ck">FOV</td><td><div class="cv-wrap"><span class="cv-val">viewmodel_fov 60</span><button class="copy-btn" data-v="viewmodel_fov 60">copy</button></div></td></tr>
+            <tr><td class="ck">Sol El</td><td><div class="cv-wrap"><span class="cv-val">cl_prefer_lefthanded 0</span><button class="copy-btn" data-v="cl_prefer_lefthanded 0">copy</button></div></td></tr>
           </table>
         </div>
-        <div class="cs-block">
+        <div>
           <div class="cs-btitle">Radar</div>
           <table class="cs-tbl">
-            <tr><td class="ck">Ortala</td><td class="cv">Kapalı</td></tr>
-            <tr><td class="ck">Döndür</td><td class="cv">Kapalı</td></tr>
-            <tr><td class="ck">HUD Ölçeği</td><td class="cv">1.20</td></tr>
-            <tr><td class="ck">Harita Ölçeği</td><td class="cv">0.40</td></tr>
-            <tr><td class="ck">Skor Tablosu Kare</td><td class="cv">Açık</td></tr>
-            <tr><td class="ck">Arka Plan Opaklığı</td><td class="cv">0.40</td></tr>
+            <tr><td class="ck">Ortala</td><td><div class="cv-wrap"><span class="cv-val">cl_radar_always_centered 0</span><button class="copy-btn" data-v="cl_radar_always_centered 0">copy</button></div></td></tr>
+            <tr><td class="ck">Döndür</td><td><div class="cv-wrap"><span class="cv-val">cl_radar_rotate 0</span><button class="copy-btn" data-v="cl_radar_rotate 0">copy</button></div></td></tr>
+            <tr><td class="ck">HUD Ölçeği</td><td><div class="cv-wrap"><span class="cv-val">cl_hud_radar_scale 1.20</span><button class="copy-btn" data-v="cl_hud_radar_scale 1.20">copy</button></div></td></tr>
+            <tr><td class="ck">Harita Ölçeği</td><td><div class="cv-wrap"><span class="cv-val">cl_radar_scale 0.40</span><button class="copy-btn" data-v="cl_radar_scale 0.40">copy</button></div></td></tr>
+            <tr><td class="ck">Skor Tablosu Kare</td><td><div class="cv-wrap"><span class="cv-val">cl_radar_square_with_scoreboard 1</span><button class="copy-btn" data-v="cl_radar_square_with_scoreboard 1">copy</button></div></td></tr>
+            <tr><td class="ck">Arka Plan Opaklığı</td><td><div class="cv-wrap"><span class="cv-val">cl_hud_radar_background_alpha 0.40</span><button class="copy-btn" data-v="cl_hud_radar_background_alpha 0.40">copy</button></div></td></tr>
           </table>
         </div>
       </div>
 
-      <div class="cs-block">
+      <!-- Crosshair -->
+      <div>
         <div class="cs-btitle">Nişangâh (Crosshair)</div>
         <div class="g2">
           <table class="cs-tbl">
-            <tr><td class="ck">Stil</td><td class="cv">4 — Statik</td></tr>
-            <tr><td class="ck">Boyut</td><td class="cv">1.2</td></tr>
-            <tr><td class="ck">Kalınlık</td><td class="cv">0.7</td></tr>
-            <tr><td class="ck">Boşluk</td><td class="cv">−5.0</td></tr>
-            <tr><td class="ck">Silah Boşluğu</td><td class="cv">Açık</td></tr>
-            <tr><td class="ck">Nokta</td><td class="cv">Kapalı</td></tr>
-            <tr><td class="ck">Dış Hat</td><td class="cv">Kapalı</td></tr>
-            <tr><td class="ck">Renk (R / G / B)</td><td class="cv">0 / 255 / 255</td></tr>
-            <tr><td class="ck">Opaklık</td><td class="cv">255</td></tr>
-            <tr><td class="ck">El Bombası Nişangâhı</td><td class="cv">Kullanıcı</td></tr>
+            <tr><td class="ck">Stil</td><td><div class="cv-wrap"><span class="cv-val">cl_crosshairstyle 4</span><button class="copy-btn" data-v="cl_crosshairstyle 4">copy</button></div></td></tr>
+            <tr><td class="ck">Silah Boşluğu</td><td><div class="cv-wrap"><span class="cv-val">cl_crosshairgap_useweaponvalue 1</span><button class="copy-btn" data-v="cl_crosshairgap_useweaponvalue 1">copy</button></div></td></tr>
+            <tr><td class="ck">Nokta</td><td><div class="cv-wrap"><span class="cv-val">cl_crosshairdot 0</span><button class="copy-btn" data-v="cl_crosshairdot 0">copy</button></div></td></tr>
+            <tr><td class="ck">Boyut</td><td><div class="cv-wrap"><span class="cv-val">cl_crosshairsize 1.2</span><button class="copy-btn" data-v="cl_crosshairsize 1.2">copy</button></div></td></tr>
+            <tr><td class="ck">Kalınlık</td><td><div class="cv-wrap"><span class="cv-val">cl_crosshairthickness 0.7</span><button class="copy-btn" data-v="cl_crosshairthickness 0.7">copy</button></div></td></tr>
           </table>
-          <div>
-            <div class="ch-prev">
-              <div class="chl ch-h1"></div>
-              <div class="chl ch-h2"></div>
-              <div class="chl ch-v1"></div>
-              <div class="chl ch-v2"></div>
-            </div>
-            <p class="ch-lbl">Önizleme — #00FFFF Cyan</p>
-          </div>
+          <table class="cs-tbl">
+            <tr><td class="ck">Boşluk</td><td><div class="cv-wrap"><span class="cv-val">cl_crosshairgap -5.0</span><button class="copy-btn" data-v="cl_crosshairgap -5.0">copy</button></div></td></tr>
+            <tr><td class="ck">Dış Hat</td><td><div class="cv-wrap"><span class="cv-val">cl_crosshair_drawoutline 0</span><button class="copy-btn" data-v="cl_crosshair_drawoutline 0">copy</button></div></td></tr>
+            <tr><td class="ck">Renk</td><td><div class="cv-wrap"><span class="cv-val">cl_crosshaircolor 5</span><button class="copy-btn" data-v="cl_crosshaircolor 5">copy</button></div></td></tr>
+            <tr><td class="ck">R / G / B</td><td><div class="cv-wrap"><span class="cv-val">0 / 255 / 255</span><button class="copy-btn" data-v="cl_crosshaircolor_r 0; cl_crosshaircolor_g 255; cl_crosshaircolor_b 255">copy</button></div></td></tr>
+            <tr><td class="ck">Opaklık</td><td><div class="cv-wrap"><span class="cv-val">cl_crosshairalpha 255</span><button class="copy-btn" data-v="cl_crosshairalpha 255">copy</button></div></td></tr>
+            <tr><td class="ck">El Bombası Nişangâhı</td><td><div class="cv-wrap"><span class="cv-val">cl_grenadecrosshair_keepusercrosshair 1</span><button class="copy-btn" data-v="cl_grenadecrosshair_keepusercrosshair 1">copy</button></div></td></tr>
+          </table>
         </div>
       </div>
 
+      <!-- Hassasiyet + Görüntü -->
       <div class="g2">
-        <div class="cs-block">
+        <div>
           <div class="cs-btitle">Fare & Hassasiyet</div>
           <table class="cs-tbl">
-            <tr><td class="ck">Oyun Hassasiyeti</td><td class="cv">0.67</td></tr>
-            <tr><td class="ck">Zum Hassasiyeti</td><td class="cv">1.10</td></tr>
-            <tr><td class="ck">Mouse DPI</td><td class="cv">1600</td></tr>
-            <tr><td class="ck">Mouse Hz (Polling)</td><td class="cv">2000 Hz</td></tr>
-            <tr><td class="ck">eDPI</td><td class="cv">1072</td></tr>
+            <tr><td class="ck">Oyun Hassasiyeti</td><td><div class="cv-wrap"><span class="cv-val">sensitivity 0.67</span><button class="copy-btn" data-v="sensitivity 0.67">copy</button></div></td></tr>
+            <tr><td class="ck">Zum Hassasiyeti</td><td><div class="cv-wrap"><span class="cv-val">zoom_sensitivity_ratio 1.10</span><button class="copy-btn" data-v="zoom_sensitivity_ratio 1.10">copy</button></div></td></tr>
+            <tr><td class="ck">Mouse DPI</td><td><div class="cv-wrap"><span class="cv-val">1600 DPI</span></div></td></tr>
+            <tr><td class="ck">Mouse Hz (Polling)</td><td><div class="cv-wrap"><span class="cv-val">8000 Hz</span></div></td></tr>
+            <tr><td class="ck">eDPI</td><td><div class="cv-wrap"><span class="cv-val">1072</span></div></td></tr>
           </table>
         </div>
-        <div class="cs-block">
+        <div>
           <div class="cs-btitle">Görüntü Ayarları</div>
           <table class="cs-tbl">
-            <tr><td class="ck">Görüntü Oranı</td><td class="cv">4:3</td></tr>
-            <tr><td class="ck">Çözünürlük</td><td class="cv">1920 × 1440</td></tr>
-            <tr><td class="ck">Yenileme Hızı</td><td class="cv">144 Hz</td></tr>
-            <tr><td class="ck">Parlaklık</td><td class="cv">%105</td></tr>
+            <tr><td class="ck">Oran</td><td><div class="cv-wrap"><span class="cv-val">4:3</span></div></td></tr>
+            <tr><td class="ck">Çözünürlük</td><td><div class="cv-wrap"><span class="cv-val">1920 × 1440</span></div></td></tr>
+            <tr><td class="ck">Yenileme Hızı</td><td><div class="cv-wrap"><span class="cv-val">144 Hz</span></div></td></tr>
+            <tr><td class="ck">Parlaklık</td><td><div class="cv-wrap"><span class="cv-val">%105</span></div></td></tr>
           </table>
         </div>
       </div>
 
-      <div class="cs-block">
+      <!-- Grafik Ayarları -->
+      <div>
         <div class="cs-btitle">Grafik Ayarları</div>
         <div class="g2">
           <table class="cs-tbl">
-            <tr><td class="ck">Oyuncu Kontrastı</td><td class="cv">Etkin</td></tr>
-            <tr><td class="ck">V-Sync</td><td class="cv">Devre Dışı</td></tr>
-            <tr><td class="ck">G-Sync</td><td class="cv">Devre Dışı</td></tr>
-            <tr><td class="ck">Nvidia Reflex</td><td class="cv">Etkin</td></tr>
-            <tr><td class="ck">Oyun İçi Maks. FPS</td><td class="cv">400</td></tr>
-            <tr><td class="ck">Menü Maks. FPS</td><td class="cv">200</td></tr>
-            <tr><td class="ck">Kenar Yumuşatma</td><td class="cv">2× MSAA</td></tr>
+            <tr><td class="ck">Oyuncu Kontrastı</td><td><div class="cv-wrap"><span class="cv-val">Etkin</span></div></td></tr>
+            <tr><td class="ck">V-Sync</td><td><div class="cv-wrap"><span class="cv-val">Devre Dışı</span></div></td></tr>
+            <tr><td class="ck">G-Sync</td><td><div class="cv-wrap"><span class="cv-val">Devre Dışı</span></div></td></tr>
+            <tr><td class="ck">Nvidia Reflex</td><td><div class="cv-wrap"><span class="cv-val">Etkin</span></div></td></tr>
+            <tr><td class="ck">Oyun İçi Maks. FPS</td><td><div class="cv-wrap"><span class="cv-val">400</span></div></td></tr>
+            <tr><td class="ck">Menü Maks. FPS</td><td><div class="cv-wrap"><span class="cv-val">200</span></div></td></tr>
+            <tr><td class="ck">Kenar Yumuşatma</td><td><div class="cv-wrap"><span class="cv-val">2× MSAA</span></div></td></tr>
           </table>
           <table class="cs-tbl">
-            <tr><td class="ck">Evrensel Gölge Kalitesi</td><td class="cv">Düşük</td></tr>
-            <tr><td class="ck">Dinamik Gölgeler</td><td class="cv">Tümü</td></tr>
-            <tr><td class="ck">Model / Doku Detayı</td><td class="cv">Düşük</td></tr>
-            <tr><td class="ck">Doku Filtreleme</td><td class="cv">2×</td></tr>
-            <tr><td class="ck">Shader Detayı</td><td class="cv">Düşük</td></tr>
-            <tr><td class="ck">Parçacık Detayı</td><td class="cv">Düşük</td></tr>
-            <tr><td class="ck">Ortam Gölgelemesi</td><td class="cv">Devre Dışı</td></tr>
-            <tr><td class="ck">Yüksek Dinamik Aralık</td><td class="cv">Performans</td></tr>
-            <tr><td class="ck">FidelityFX</td><td class="cv">Devre Dışı</td></tr>
+            <tr><td class="ck">Evrensel Gölge</td><td><div class="cv-wrap"><span class="cv-val">Düşük</span></div></td></tr>
+            <tr><td class="ck">Dinamik Gölgeler</td><td><div class="cv-wrap"><span class="cv-val">Tümü</span></div></td></tr>
+            <tr><td class="ck">Model / Doku Detayı</td><td><div class="cv-wrap"><span class="cv-val">Düşük</span></div></td></tr>
+            <tr><td class="ck">Doku Filtreleme</td><td><div class="cv-wrap"><span class="cv-val">2×</span></div></td></tr>
+            <tr><td class="ck">Shader Detayı</td><td><div class="cv-wrap"><span class="cv-val">Düşük</span></div></td></tr>
+            <tr><td class="ck">Parçacık Detayı</td><td><div class="cv-wrap"><span class="cv-val">Düşük</span></div></td></tr>
+            <tr><td class="ck">Ortam Gölgelemesi</td><td><div class="cv-wrap"><span class="cv-val">Devre Dışı</span></div></td></tr>
+            <tr><td class="ck">Yüksek Dinamik Aralık</td><td><div class="cv-wrap"><span class="cv-val">Performans</span></div></td></tr>
+            <tr><td class="ck">FidelityFX</td><td><div class="cv-wrap"><span class="cv-val">Devre Dışı</span></div></td></tr>
           </table>
         </div>
       </div>
 
-      <div class="cs-block">
+      <!-- Bindlar -->
+      <div>
         <div class="cs-btitle">Klavye Bağlamaları (Binds)</div>
         <div class="binds-g">
           <div>
@@ -614,7 +722,7 @@ footer { padding: 4rem 0 2.5rem; }
   </div>
 </section>
 
-<!-- PC ÖZELLİKLERİ -->
+<!-- ═══ PC ÖZELLİKLERİ ═══ -->
 <section id="pc-ozellikleri">
   <div class="wrap reveal">
     <div class="sh"><span class="snum">06</span><h2 class="stitle">Ekipmanlarım</h2></div>
@@ -632,7 +740,7 @@ footer { padding: 4rem 0 2.5rem; }
       <div class="pci">
         <span class="plbl">Mouse</span>
         <div class="pname">RAWM ES21 Pro</div>
-        <div class="pdet">Wireless<br>2000 Hz Polling Rate</div>
+        <div class="pdet">Wireless<br>8000 Hz Polling Rate</div>
       </div>
       <div class="pci">
         <span class="plbl">Klavye</span>
@@ -642,7 +750,7 @@ footer { padding: 4rem 0 2.5rem; }
       <div class="pci">
         <span class="plbl">Kulaklık</span>
         <div class="pname">HyperX Cloud 3S</div>
-        <div class="pdet">Wireless · 7.1 Surround Ses</div>
+        <div class="pdet">Wireless · 7.1 Surround</div>
       </div>
       <div class="pci">
         <span class="plbl">Mikrofon</span>
@@ -653,7 +761,56 @@ footer { padding: 4rem 0 2.5rem; }
   </div>
 </section>
 
-<!-- DESTEK -->
+<!-- ═══ SOSYAL MEDYA ═══ -->
+<section id="sosyal-medya">
+  <div class="wrap reveal">
+    <div class="sh"><span class="snum">07</span><h2 class="stitle">Sosyal Medya</h2></div>
+    <p class="social-intro">Güncel duyurular, klip paylaşımları ve daha fazlası için beni diğer platformlarda takip etmeyi unutma!</p>
+
+    <div class="soc-grid">
+      <a href="https://kick.com/wiblegon" target="_blank" class="soc-card" style="--platform-color:#53fc18">
+        <div class="soc-plat">Kick</div>
+        <div class="soc-handle">wiblegon</div>
+        <div class="soc-desc">Canlı yayınlar için ana platform</div>
+        <span class="soc-arr">→</span>
+      </a>
+      <a href="https://www.instagram.com/wiblegon/" target="_blank" class="soc-card" style="--platform-color:#e1306c">
+        <div class="soc-plat">Instagram</div>
+        <div class="soc-handle">@wiblegon</div>
+        <div class="soc-desc">Günlük içerikler & hikayeler</div>
+        <span class="soc-arr">→</span>
+      </a>
+      <a href="https://www.youtube.com/@wiblegon" target="_blank" class="soc-card" style="--platform-color:#ff0000">
+        <div class="soc-plat">YouTube</div>
+        <div class="soc-handle">@wiblegon</div>
+        <div class="soc-desc">Yayın klipleri & videolar</div>
+        <span class="soc-arr">→</span>
+      </a>
+      <a href="https://www.tiktok.com/@wiblegon" target="_blank" class="soc-card" style="--platform-color:#69c9d0">
+        <div class="soc-plat">TikTok</div>
+        <div class="soc-handle">@wiblegon</div>
+        <div class="soc-desc">Kısa klip & komik anlar</div>
+        <span class="soc-arr">→</span>
+      </a>
+      <div class="soc-card disabled" style="--platform-color:#5865F2">
+        <div class="soc-plat">Discord</div>
+        <div class="soc-handle">Yakında</div>
+        <div class="soc-desc">Sunucu tadilatta — çok yakında!</div>
+        <span class="soc-arr" style="font-size:.7rem;letter-spacing:.06em;text-transform:uppercase">Tadilatta</span>
+      </div>
+    </div>
+
+    <div class="email-card">
+      <div>
+        <span class="ec-label">İş Birliği & İletişim</span>
+        <div class="ec-addr">contact.wiblegon@gmail.com</div>
+      </div>
+      <a href="mailto:contact.wiblegon@gmail.com" class="btn btn-ghost">Mail Gönder</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ DESTEK ═══ -->
 <div id="destek" class="wrap">
   <div class="support-s reveal">
     <p class="slbl">Bana Destek Ol</p>
@@ -668,38 +825,37 @@ footer { padding: 4rem 0 2.5rem; }
 
 </main>
 
-<!-- FOOTER -->
+<!-- ═══ FOOTER ═══ -->
 <footer>
   <div class="wrap">
     <div class="foot-g">
       <div>
-        <div class="fl-name">Wiblegon</div>
+        <div class="foot-logo">
+          <img src="Logo_Ham.png" alt="Wiblegon Logo">
+          <span>Wiblegon</span>
+        </div>
         <p>Erciyes Üniversitesi'nde okuyan, sıkılınca yayın açan, bir gün tam zamanlı yayıncı olmayı hedefleyen biri. Beni sosyal medyadan takip etmeyi unutmayın!</p>
       </div>
       <div>
-        <span class="fr-title">Sosyal Medya & İletişim</span>
-        <div class="soc-list">
-          <a href="https://kick.com/wiblegon" target="_blank" class="soc-r">
-            <span class="sp">Kick</span><span class="sh">kick.com/wiblegon</span>
+        <span class="fr-title">Hızlı Erişim</span>
+        <div class="mini-soc">
+          <a href="https://kick.com/wiblegon" target="_blank" class="mini-row">
+            <span class="mp">Kick</span><span class="mh">kick.com/wiblegon</span>
           </a>
-          <a href="https://www.instagram.com/wiblegon/" target="_blank" class="soc-r">
-            <span class="sp">Instagram</span><span class="sh">@wiblegon</span>
+          <a href="https://www.instagram.com/wiblegon/" target="_blank" class="mini-row">
+            <span class="mp">Instagram</span><span class="mh">@wiblegon</span>
           </a>
-          <a href="https://www.youtube.com/@wiblegon" target="_blank" class="soc-r">
-            <span class="sp">YouTube</span><span class="sh">@wiblegon</span>
+          <a href="https://www.youtube.com/@wiblegon" target="_blank" class="mini-row">
+            <span class="mp">YouTube</span><span class="mh">@wiblegon</span>
           </a>
-          <a href="https://www.tiktok.com/@wiblegon" target="_blank" class="soc-r">
-            <span class="sp">TikTok</span><span class="sh">@wiblegon</span>
+          <a href="https://www.tiktok.com/@wiblegon" target="_blank" class="mini-row">
+            <span class="mp">TikTok</span><span class="mh">@wiblegon</span>
           </a>
-          <div class="soc-r" style="cursor:default">
-            <span class="sp">Discord</span>
-            <span class="sh" style="color:var(--t3)">Yakında açılıyor</span>
-            <span class="badge">Tadilatta</span>
+          <div class="mini-row" style="cursor:default">
+            <span class="mp">Discord</span>
+            <span class="mh" style="color:var(--t4)">Yakında</span>
+            <span class="mbadge">Tadilatta</span>
           </div>
-        </div>
-        <div class="email-r">
-          <span class="ep">İş Birliği</span>
-          <span class="ea">contact.wiblegon@gmail.com</span>
         </div>
       </div>
     </div>
@@ -711,27 +867,30 @@ footer { padding: 4rem 0 2.5rem; }
 </footer>
 
 <script>
+/* ─── CURSOR ─── */
 const cur = document.getElementById('cur');
 document.addEventListener('mousemove', e => {
   cur.style.left = e.clientX + 'px';
   cur.style.top = e.clientY + 'px';
 });
-document.querySelectorAll('a, button').forEach(el => {
+document.querySelectorAll('a, button, .soc-card, .pci, .rule, .lcol').forEach(el => {
   el.addEventListener('mouseenter', () => cur.classList.add('big'));
   el.addEventListener('mouseleave', () => cur.classList.remove('big'));
 });
 
+/* ─── HAMBURGER ─── */
 const ham = document.getElementById('ham');
 const mnav = document.getElementById('mnav');
 ham.addEventListener('click', () => mnav.classList.toggle('on'));
 mnav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mnav.classList.remove('on')));
 
-const reveals = document.querySelectorAll('.reveal');
+/* ─── REVEAL ─── */
 const ro = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); ro.unobserve(e.target); } });
 }, { threshold: 0.06 });
-reveals.forEach(r => ro.observe(r));
+document.querySelectorAll('.reveal').forEach(r => ro.observe(r));
 
+/* ─── ACTIVE NAV ─── */
 const secs = document.querySelectorAll('section[id], div[id]');
 const nls = document.querySelectorAll('.nav-links a');
 window.addEventListener('scroll', () => {
@@ -742,6 +901,21 @@ window.addEventListener('scroll', () => {
     if (a.getAttribute('href') === '#' + current) a.classList.add('on');
   });
 }, { passive: true });
+
+/* ─── COPY BUTTONS ─── */
+document.querySelectorAll('.copy-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const val = btn.dataset.v;
+    navigator.clipboard.writeText(val).then(() => {
+      btn.textContent = '✓ kopyalandı';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'copy';
+        btn.classList.remove('copied');
+      }, 1800);
+    });
+  });
+});
 </script>
 </body>
 </html>
