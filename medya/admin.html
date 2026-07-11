@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wiblegon Medya — Yönetim</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #051518; --bg2: #0b2126; --bg3: #122d35;
+  --line: rgba(202,207,214,.08); --lineh: rgba(202,207,214,.18);
+  --t1: #CACFD6; --t2: #88A4AB; --t3: #4E727C;
+  --acc: #179B3D; --yellow: #FACA3B; --red: #e5484d;
+  --fh: "Syne", sans-serif; --fb: "DM Sans", sans-serif; --fm: "JetBrains Mono", monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--t1); font-family: var(--fb); font-size: 14px; line-height: 1.6; }
+.saray { max-width: 980px; margin: 0 auto; padding: 2rem 1.5rem 5rem; }
+h1 { font-family: var(--fh); font-size: 1.5rem; }
+h1 .g { color: var(--acc); }
+.ust { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.6rem; flex-wrap: wrap; }
+.ust a { color: var(--t3); font-size: .75rem; text-decoration: none; }
+.ust a:hover { color: var(--t1); }
+input, select { background: var(--bg2); border: 1px solid var(--line); border-radius: 8px; color: var(--t1); padding: .55rem .8rem; font-size: .85rem; font-family: var(--fb); outline: none; }
+input:focus, select:focus { border-color: var(--acc); }
+button { background: var(--acc); color: #fff; border: none; border-radius: 8px; padding: .55rem 1.1rem; font-size: .75rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; font-family: var(--fb); transition: opacity .15s; }
+button:hover { opacity: .85; }
+button.gri { background: var(--bg3); color: var(--t2); }
+button.sari { background: var(--yellow); color: #051518; }
+button.kirmizi { background: var(--red); }
+button.mini { padding: .3rem .6rem; font-size: .68rem; }
+
+.sekmeler { display: flex; gap: .4rem; margin-bottom: 1.4rem; flex-wrap: wrap; }
+.sekme { background: none; border: 1px solid var(--line); color: var(--t2); border-radius: 50px; text-transform: uppercase; }
+.sekme.on { background: var(--acc); border-color: var(--acc); color: #fff; }
+.panel { display: none; }
+.panel.on { display: block; }
+
+table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+th { text-align: left; color: var(--t3); font-size: .68rem; text-transform: uppercase; letter-spacing: .07em; padding: .5rem .6rem; border-bottom: 1px solid var(--lineh); }
+td { padding: .55rem .6rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
+td.mono { font-family: var(--fm); font-size: .78rem; }
+.kutu { background: var(--bg2); border: 1px solid var(--line); border-radius: 12px; padding: 1.2rem; margin-bottom: 1.2rem; }
+.kutu h3 { font-size: .8rem; text-transform: uppercase; letter-spacing: .07em; color: var(--t2); margin-bottom: .8rem; }
+.satir { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; margin-bottom: .6rem; }
+.rozet { font-size: .62rem; font-weight: 700; text-transform: uppercase; padding: .15rem .5rem; border-radius: 4px; font-family: var(--fm); }
+.rozet.video { background: var(--acc); color: #fff; }
+.rozet.ses { background: var(--yellow); color: #051518; }
+.rozet.foto { background: #3b82f6; color: #fff; }
+.rozet.medya { background: var(--bg3); color: var(--t2); }
+#sonuc { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--bg3); border: 1px solid var(--lineh); padding: .6rem 1.2rem; border-radius: 50px; font-size: .8rem; display: none; max-width: 90vw; z-index: 10; }
+.aciklama { font-size: .75rem; color: var(--t3); margin-top: .4rem; }
+pre { white-space: pre-wrap; word-break: break-all; font-size: .7rem; color: var(--t3); font-family: var(--fm); max-height: 100px; overflow: auto; }
+</style>
+</head>
+<body>
+<div class="saray">
+  <div class="ust">
+    <h1>WIBLEGON <span class="g">MEDYA</span> · Yönetim</h1>
+    <a href="./">← izleyici sayfası</a>
+    <span style="flex:1"></span>
+    <input id="anahtar" type="password" placeholder="Yönetici anahtarı" style="width:180px">
+    <button onclick="anahtarKaydet()">Bağlan</button>
+  </div>
+
+  <div class="sekmeler">
+    <button class="sekme on" data-p="krediler">Haklar</button>
+    <button class="sekme" data-p="kuyruk">Kuyruk</button>
+    <button class="sekme" data-p="medya">Kütüphane</button>
+    <button class="sekme" data-p="loglar">Loglar</button>
+    <button class="sekme" data-p="kurulum">Kurulum</button>
+  </div>
+
+  <!-- HAKLAR -->
+  <div class="panel on" id="p-krediler">
+    <div class="kutu">
+      <h3>Elle hak ekle / çıkar (hata düzeltme)</h3>
+      <div class="satir">
+        <input id="k-ad" placeholder="kick kullanıcı adı" style="width:200px">
+        <select id="k-tur"><option value="video">video</option><option value="ses">ses</option><option value="foto">foto</option></select>
+        <input id="k-delta" type="number" value="1" style="width:80px">
+        <button onclick="krediDegistir()">Uygula</button>
+      </div>
+      <div class="aciklama">Pozitif sayı ekler, negatif çıkarır. Örn: webhook kaçırdıysa +1, yanlışlıkla verildiyse -1.</div>
+    </div>
+    <div class="kutu">
+      <h3>Tüm izleyiciler <button class="mini gri" onclick="kredilerYukle()">Yenile</button></h3>
+      <table id="t-krediler"><thead><tr><th>Kullanıcı</th><th>🎬 Video</th><th>🎵 Ses</th><th>🖼️ Foto</th><th></th></tr></thead><tbody></tbody></table>
+    </div>
+  </div>
+
+  <!-- KUYRUK -->
+  <div class="panel" id="p-kuyruk">
+    <div class="kutu">
+      <h3>Oynatma kuyruğu (son 24 saat) <button class="mini gri" onclick="kuyrukYukle()">Yenile</button></h3>
+      <table id="t-kuyruk"><thead><tr><th>#</th><th>İzleyici</th><th>Medya</th><th>Kaynak</th><th>Durum</th><th></th></tr></thead><tbody></tbody></table>
+      <div class="aciklama">"İptal + iade": krediyle alınmışsa hakkı geri verir, eski usul ödülse Kick puanını iade eder.</div>
+    </div>
+  </div>
+
+  <!-- KÜTÜPHANE -->
+  <div class="panel" id="p-medya">
+    <div class="kutu">
+      <h3>Medya ekle</h3>
+      <div class="satir">
+        <select id="m-tur"><option value="video">video</option><option value="ses">ses</option><option value="foto">foto</option></select>
+        <input id="m-baslik" placeholder="başlık" style="width:220px">
+        <input id="m-url" placeholder="dosyalar/ornek.mp4 veya https://..." style="flex:1;min-width:220px">
+      </div>
+      <div class="satir">
+        <input id="m-thumb" placeholder="kapak görseli (opsiyonel)" style="flex:1;min-width:220px">
+        <input id="m-sure" type="number" placeholder="süre sn (ops.)" style="width:120px">
+        <button onclick="medyaEkle()">Ekle</button>
+      </div>
+      <div class="aciklama">Dosyayı GitHub reposunda <b>medya/dosyalar/</b> klasörüne at, sonra buraya <b>dosyalar/dosyaadi.mp4</b> yaz. Foto için süre = ekranda kalma süresi (boşsa 10 sn).</div>
+    </div>
+    <div class="kutu">
+      <h3>Kütüphane <button class="mini gri" onclick="medyaYukle()">Yenile</button></h3>
+      <table id="t-medya"><thead><tr><th>#</th><th>Tür</th><th>Başlık</th><th>URL</th><th>Oynatma</th><th></th></tr></thead><tbody></tbody></table>
+    </div>
+  </div>
+
+  <!-- LOGLAR -->
+  <div class="panel" id="p-loglar">
+    <div class="kutu">
+      <h3>Son olaylar <button class="mini gri" onclick="loglarYukle()">Yenile</button></h3>
+      <table id="t-loglar"><thead><tr><th>Zaman</th><th>Tip</th><th>İçerik</th></tr></thead><tbody></tbody></table>
+    </div>
+  </div>
+
+  <!-- KURULUM -->
+  <div class="panel" id="p-kurulum">
+    <div class="kutu">
+      <h3>1) Veritabanını kur / sıfırla</h3>
+      <div class="satir"><button onclick="kur()">Kur (eski sistem tablolarını da siler)</button></div>
+      <div class="aciklama">Yeni tabloları oluşturur, örnek test videosunu ekler ve <b>eski wiblegonstream sisteminin tüm tablolarını kalıcı olarak siler</b>.</div>
+    </div>
+    <div class="kutu">
+      <h3>2) Kick bağlantısı</h3>
+      <div class="satir">
+        <input id="s-secret" type="password" placeholder="Kick Client Secret (gerekirse)" style="width:280px">
+        <button class="gri" onclick="secretKaydet()">Secret kaydet</button>
+      </div>
+      <div class="satir">
+        <button class="sari" onclick="yayinciGiris()">Yayıncı olarak giriş yap</button>
+        <button onclick="abone()">Webhook aboneliğini kur</button>
+      </div>
+      <div class="aciklama">Sırayla: secret (daha önce kaydettiysen gerekmez) → yayıncı girişi → webhook aboneliği. Sonra Kick'te ödülleri oluştur: <b>Video Oynat (250)</b>, <b>Ses Oynat (200)</b>, <b>Foto Oynat (100)</b> — adın içinde video/ses/foto kelimesi geçsin yeter.</div>
+    </div>
+    <div class="kutu">
+      <h3>3) Test</h3>
+      <div class="satir">
+        <input id="test-medya" type="number" placeholder="medya id" style="width:100px">
+        <button onclick="testOynat()">Overlay'de oynat</button>
+      </div>
+      <div class="satir">
+        <input id="test-ad" placeholder="kullanıcı adı" style="width:160px">
+        <select id="test-tur"><option value="video">video</option><option value="ses">ses</option><option value="foto">foto</option></select>
+        <button class="gri" onclick="testHak()">Sahte ödül ver (+1 hak)</button>
+      </div>
+      <div class="aciklama">OBS tarayıcı kaynağı: <b id="overlay-url"></b></div>
+    </div>
+  </div>
+</div>
+
+<div id="sonuc"></div>
+
+<script src="config.js"></script>
+<script>
+const API = CONFIG.API_BASE;
+let ANAHTAR = localStorage.getItem("medya_admin") || "";
+document.getElementById("anahtar").value = ANAHTAR;
+document.getElementById("overlay-url").textContent = location.origin + location.pathname.replace(/admin\.html.*/, "") + "overlay.html";
+
+function anahtarKaydet() {
+  ANAHTAR = document.getElementById("anahtar").value.trim();
+  localStorage.setItem("medya_admin", ANAHTAR);
+  bildir("Anahtar kaydedildi.");
+  hepsiniYukle();
+}
+
+async function api(yol, secenekler = {}) {
+  secenekler.headers = Object.assign({ "Content-Type": "application/json", "X-Admin-Key": ANAHTAR }, secenekler.headers || {});
+  const r = await fetch(API + yol, secenekler);
+  const j = await r.json().catch(() => null);
+  if (!r.ok) throw new Error((j && j.hata) || (r.status === 401 ? "anahtar yanlış" : "hata " + r.status));
+  return j;
+}
+
+function bildir(m) {
+  const s = document.getElementById("sonuc");
+  s.textContent = m; s.style.display = "block";
+  clearTimeout(s._z); s._z = setTimeout(() => s.style.display = "none", 4000);
+}
+function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+
+// sekmeler
+document.querySelectorAll(".sekme").forEach(b => b.onclick = () => {
+  document.querySelectorAll(".sekme").forEach(x => x.classList.remove("on"));
+  document.querySelectorAll(".panel").forEach(x => x.classList.remove("on"));
+  b.classList.add("on");
+  document.getElementById("p-" + b.dataset.p).classList.add("on");
+});
+
+// ---- Haklar ----
+async function kredilerYukle() {
+  try {
+    const liste = await api("/api/admin/krediler");
+    document.querySelector("#t-krediler tbody").innerHTML = liste.map(k =>
+      `<tr><td class="mono">${esc(k.kullanici)}</td><td>${k.video}</td><td>${k.ses}</td><td>${k.foto}</td>
+       <td><button class="mini gri" onclick="hizliDoldur('${esc(k.kullanici)}')">Düzenle</button></td></tr>`
+    ).join("") || `<tr><td colspan="5" style="color:var(--t3)">Henüz hak kazanan yok.</td></tr>`;
+  } catch (e) { bildir("❌ " + e.message); }
+}
+function hizliDoldur(ad) {
+  document.getElementById("k-ad").value = ad;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+async function krediDegistir() {
+  try {
+    const r = await api("/api/admin/kredi", { method: "POST", body: JSON.stringify({
+      kullanici: document.getElementById("k-ad").value,
+      tur: document.getElementById("k-tur").value,
+      delta: Number(document.getElementById("k-delta").value),
+    })});
+    bildir(`✅ Yeni durum — video: ${r.krediler.video}, ses: ${r.krediler.ses}, foto: ${r.krediler.foto}`);
+    kredilerYukle();
+  } catch (e) { bildir("❌ " + e.message); }
+}
+
+// ---- Kuyruk ----
+async function kuyrukYukle() {
+  try {
+    const liste = await api("/api/admin/kuyruk");
+    document.querySelector("#t-kuyruk tbody").innerHTML = liste.map(k => {
+      const iptalEdilebilir = ["onaylandi", "oynuyor", "eslesmedi"].includes(k.durum);
+      return `<tr><td class="mono">${k.id}</td><td class="mono">${esc(k.kullanici)}</td><td>${esc(k.medya)}</td>
+        <td><span class="rozet ${k.kaynak === 'odul' ? 'medya' : (k.tur || 'medya')}">${esc(k.kaynak)}${k.tur && k.kaynak === 'kredi' ? '·' + k.tur : ''}</span></td>
+        <td class="mono">${esc(k.durum)}</td>
+        <td>${iptalEdilebilir ? `<button class="mini kirmizi" onclick="iptal(${k.id}, true)">İptal + iade</button>
+             <button class="mini gri" onclick="iptal(${k.id}, false)">İptal</button>` : ""}</td></tr>`;
+    }).join("") || `<tr><td colspan="6" style="color:var(--t3)">Kuyruk boş.</td></tr>`;
+  } catch (e) { bildir("❌ " + e.message); }
+}
+async function iptal(id, iade) {
+  try {
+    await api(`/api/admin/kuyruk/${id}/iptal`, { method: "POST", body: JSON.stringify({ iade }) });
+    bildir("✅ İptal edildi" + (iade ? " ve iade yapıldı." : "."));
+    kuyrukYukle();
+  } catch (e) { bildir("❌ " + e.message); }
+}
+
+// ---- Kütüphane ----
+async function medyaYukle() {
+  try {
+    const liste = await fetch(API + "/api/medya").then(r => r.json());
+    document.querySelector("#t-medya tbody").innerHTML = liste.map(m =>
+      `<tr><td class="mono">${m.id}</td><td><span class="rozet ${m.tur}">${m.tur}</span></td><td>${esc(m.baslik)}</td>
+       <td class="mono" style="max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(m.url)}</td>
+       <td>${m.oynatma || 0}</td>
+       <td><button class="mini kirmizi" onclick="medyaSil(${m.id})">Sil</button></td></tr>`
+    ).join("") || `<tr><td colspan="6" style="color:var(--t3)">Kütüphane boş — yukarıdan ekle.</td></tr>`;
+  } catch (e) { bildir("❌ " + e.message); }
+}
+async function medyaEkle() {
+  try {
+    await api("/api/admin/medya", { method: "POST", body: JSON.stringify({
+      tur: document.getElementById("m-tur").value,
+      baslik: document.getElementById("m-baslik").value,
+      url: document.getElementById("m-url").value.trim(),
+      thumb: document.getElementById("m-thumb").value.trim() || null,
+      sure: Number(document.getElementById("m-sure").value) || 0,
+    })});
+    bildir("✅ Eklendi.");
+    ["m-baslik", "m-url", "m-thumb", "m-sure"].forEach(id => document.getElementById(id).value = "");
+    medyaYukle();
+  } catch (e) { bildir("❌ " + e.message); }
+}
+async function medyaSil(id) {
+  if (!confirm("#" + id + " silinsin mi?")) return;
+  try { await api("/api/admin/medya/" + id, { method: "DELETE" }); bildir("✅ Silindi."); medyaYukle(); }
+  catch (e) { bildir("❌ " + e.message); }
+}
+
+// ---- Loglar ----
+async function loglarYukle() {
+  try {
+    const liste = await api("/api/admin/loglar");
+    document.querySelector("#t-loglar tbody").innerHTML = liste.map(l =>
+      `<tr><td class="mono">${esc(l.zaman)}</td><td class="mono">${esc(l.tip)}</td><td><pre>${esc(l.govde)}</pre></td></tr>`
+    ).join("") || `<tr><td colspan="3" style="color:var(--t3)">Log yok.</td></tr>`;
+  } catch (e) { bildir("❌ " + e.message); }
+}
+
+// ---- Kurulum ----
+async function kur() {
+  if (!confirm("Eski sistemin tabloları KALICI olarak silinecek. Devam?")) return;
+  try { const r = await api("/api/admin/kur", { method: "POST" }); bildir("✅ Kuruldu. Silinen eski tablolar: " + r.eskiTablolarSilindi.join(", ")); medyaYukle(); }
+  catch (e) { bildir("❌ " + e.message); }
+}
+async function secretKaydet() {
+  try { await api("/api/admin/kick/secret", { method: "POST", body: JSON.stringify({ secret: document.getElementById("s-secret").value }) }); bildir("✅ Secret kaydedildi."); }
+  catch (e) { bildir("❌ " + e.message); }
+}
+function yayinciGiris() { location.href = API + "/auth/login?yayinci=1"; }
+async function abone() {
+  try { const r = await api("/api/admin/kick/abone", { method: "POST" }); bildir("Kick cevabı: " + JSON.stringify(r.cevap || r.durum)); }
+  catch (e) { bildir("❌ " + e.message); }
+}
+async function testOynat() {
+  try { const r = await api("/api/admin/test", { method: "POST", body: JSON.stringify({ medyaId: Number(document.getElementById("test-medya").value) }) }); bildir("✅ " + r.mesaj); }
+  catch (e) { bildir("❌ " + e.message); }
+}
+async function testHak() {
+  try { const r = await api("/api/admin/test", { method: "POST", body: JSON.stringify({ kullanici: document.getElementById("test-ad").value, tur: document.getElementById("test-tur").value }) }); bildir("✅ " + r.mesaj); kredilerYukle(); }
+  catch (e) { bildir("❌ " + e.message); }
+}
+
+function hepsiniYukle() { kredilerYukle(); kuyrukYukle(); medyaYukle(); loglarYukle(); }
+if (ANAHTAR) hepsiniYukle(); else medyaYukle();
+</script>
+</body>
+</html>

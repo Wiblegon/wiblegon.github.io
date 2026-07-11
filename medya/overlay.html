@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Wiblegon Medya — OBS Overlay</title>
+<style>
+/* OBS tarayıcı kaynağı: 1920x1080 önerilir, arka plan şeffaf */
+html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: transparent; overflow: hidden; font-family: "DM Sans", "Segoe UI", sans-serif; }
+
+#sahne { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; }
+#sahne.on { display: flex; }
+
+video, img.foto { max-width: 72%; max-height: 72%; border-radius: 14px; box-shadow: 0 20px 80px rgba(0,0,0,.6); }
+
+/* ses için görsel */
+#ses-kutu { display: none; background: rgba(5,21,24,.92); border: 1px solid rgba(23,155,61,.5); border-radius: 16px; padding: 28px 44px; align-items: center; gap: 22px; box-shadow: 0 20px 80px rgba(0,0,0,.6); }
+#ses-kutu.on { display: flex; }
+.cubuklar { display: flex; gap: 5px; align-items: flex-end; height: 44px; }
+.cubuklar span { width: 7px; background: #179B3D; border-radius: 3px; animation: zipla 1s ease-in-out infinite; }
+.cubuklar span:nth-child(2) { animation-delay: .15s; }
+.cubuklar span:nth-child(3) { animation-delay: .3s; }
+.cubuklar span:nth-child(4) { animation-delay: .45s; }
+.cubuklar span:nth-child(5) { animation-delay: .6s; }
+@keyframes zipla { 0%,100% { height: 10px; } 50% { height: 44px; } }
+#ses-baslik { color: #EDF1F2; font-size: 22px; font-weight: 700; max-width: 480px; }
+
+/* etiket */
+#etiket { position: absolute; left: 50%; transform: translateX(-50%); bottom: 7%; display: none; background: rgba(5,21,24,.9); border: 1px solid rgba(250,202,59,.5); color: #FACA3B; padding: 8px 22px; border-radius: 50px; font-size: 18px; font-weight: 600; letter-spacing: .3px; }
+#etiket.on { display: block; }
+#etiket b { color: #fff; }
+</style>
+</head>
+<body>
+
+<div id="sahne">
+  <video id="video" playsinline></video>
+  <img id="foto" class="foto" alt="">
+  <div id="ses-kutu">
+    <div class="cubuklar"><span></span><span></span><span></span><span></span><span></span></div>
+    <div id="ses-baslik"></div>
+    <audio id="ses"></audio>
+  </div>
+</div>
+<div id="etiket"></div>
+
+<script src="config.js"></script>
+<script>
+const API = CONFIG.API_BASE;
+const YOKLAMA_MS = 3000;        // sıra kontrol aralığı
+const FOTO_SURE_SN = 10;        // foto varsayılan süresi
+const AZAMI_SURE_SN = 600;      // her ihtimale karşı üst sınır (10 dk)
+
+const sahne = document.getElementById("sahne");
+const videoEl = document.getElementById("video");
+const fotoEl = document.getElementById("foto");
+const sesKutu = document.getElementById("ses-kutu");
+const sesEl = document.getElementById("ses");
+const etiket = document.getElementById("etiket");
+
+let mesgul = false;
+let guvenlikZamani = null;
+
+function tamUrl(u) { return /^https?:\/\//.test(u) ? u : u; } // göreli yollar /medya/ altından çözülür
+
+function temizle() {
+  sahne.classList.remove("on");
+  etiket.classList.remove("on");
+  sesKutu.classList.remove("on");
+  videoEl.style.display = "none";
+  fotoEl.style.display = "none";
+  videoEl.pause(); videoEl.removeAttribute("src"); videoEl.load();
+  sesEl.pause(); sesEl.removeAttribute("src"); sesEl.load();
+  clearTimeout(guvenlikZamani);
+}
+
+async function bitti() {
+  temizle();
+  try { await fetch(API + "/api/overlay/bitti", { method: "POST" }); } catch (e) {}
+  mesgul = false;
+}
+
+function etiketGoster(medya) {
+  etiket.innerHTML = `🎁 <b>@${medya.izleyici}</b> · ${medya.baslik}`;
+  etiket.classList.add("on");
+}
+
+function oynat(medya) {
+  mesgul = true;
+  sahne.classList.add("on");
+  etiketGoster(medya);
+
+  const url = tamUrl(medya.url);
+  const sinir = (medya.sure > 0 ? medya.sure : AZAMI_SURE_SN) * 1000;
+  guvenlikZamani = setTimeout(bitti, sinir); // medya takılırsa bile sıra ilerlesin
+
+  if (medya.tur === "video") {
+    videoEl.style.display = "block";
+    videoEl.src = url;
+    videoEl.onended = bitti;
+    videoEl.onerror = bitti;
+    videoEl.play().catch(bitti);
+  } else if (medya.tur === "ses") {
+    sesKutu.classList.add("on");
+    document.getElementById("ses-baslik").textContent = medya.baslik;
+    sesEl.src = url;
+    sesEl.onended = bitti;
+    sesEl.onerror = bitti;
+    sesEl.play().catch(bitti);
+  } else if (medya.tur === "foto") {
+    fotoEl.style.display = "block";
+    fotoEl.src = url;
+    fotoEl.onerror = bitti;
+    clearTimeout(guvenlikZamani);
+    guvenlikZamani = setTimeout(bitti, (medya.sure > 0 ? medya.sure : FOTO_SURE_SN) * 1000);
+  } else {
+    bitti();
+  }
+}
+
+async function yokla() {
+  if (mesgul) return;
+  try {
+    const r = await fetch(API + "/api/overlay/siradaki");
+    const medya = await r.json();
+    if (medya && medya.url) oynat(medya);
+  } catch (e) {}
+}
+
+setInterval(yokla, YOKLAMA_MS);
+yokla();
+</script>
+</body>
+</html>
