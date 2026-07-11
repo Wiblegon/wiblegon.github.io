@@ -77,7 +77,7 @@ pre { white-space: pre-wrap; word-break: break-all; font-size: .7rem; color: var
       <h3>Elle hak ekle / çıkar (hata düzeltme)</h3>
       <div class="satir">
         <input id="k-ad" placeholder="kick kullanıcı adı" style="width:200px">
-        <select id="k-tur"><option value="video">video</option><option value="ses">ses</option><option value="foto">foto</option></select>
+        <select id="k-tur"><option value="video">video</option><option value="ses">ses</option><option value="foto">foto</option><option value="sinav">şınav token</option><option value="mekik">mekik token</option></select>
         <input id="k-delta" type="number" value="1" style="width:80px">
         <button onclick="krediDegistir()">Uygula</button>
       </div>
@@ -85,7 +85,7 @@ pre { white-space: pre-wrap; word-break: break-all; font-size: .7rem; color: var
     </div>
     <div class="kutu">
       <h3>Tüm izleyiciler <button class="mini gri" onclick="kredilerYukle()">Yenile</button></h3>
-      <table id="t-krediler"><thead><tr><th>Kullanıcı</th><th>🎬 Video</th><th>🎵 Ses</th><th>🖼️ Foto</th><th></th></tr></thead><tbody></tbody></table>
+      <table id="t-krediler"><thead><tr><th>Kullanıcı</th><th>🎬 Video</th><th>🎵 Ses</th><th>🖼️ Foto</th><th>💪 Şınav</th><th>🔥 Mekik</th><th></th></tr></thead><tbody></tbody></table>
     </div>
   </div>
 
@@ -108,11 +108,12 @@ pre { white-space: pre-wrap; word-break: break-all; font-size: .7rem; color: var
         <input id="m-url" placeholder="dosyalar/ornek.mp4 veya https://..." style="flex:1;min-width:220px">
       </div>
       <div class="satir">
-        <input id="m-thumb" placeholder="kapak görseli (opsiyonel)" style="flex:1;min-width:220px">
+        <input id="m-thumb" placeholder="kapak görseli (opsiyonel)" style="flex:1;min-width:180px">
+        <input id="m-tagler" placeholder="etiketler: komik, korku, oha" style="flex:1;min-width:180px">
         <input id="m-sure" type="number" placeholder="süre sn (ops.)" style="width:120px">
         <button onclick="medyaEkle()">Ekle</button>
       </div>
-      <div class="aciklama">Dosyayı GitHub reposunda <b>medya/dosyalar/</b> klasörüne at, sonra buraya <b>dosyalar/dosyaadi.mp4</b> yaz. Foto için süre = ekranda kalma süresi (boşsa 10 sn).</div>
+      <div class="aciklama">Dosyayı GitHub reposunda <b>medya/dosyalar/</b> klasörüne at, sonra buraya <b>dosyalar/dosyaadi.mp4</b> yaz. Foto için süre = ekranda kalma süresi (boşsa 10 sn). Etiketleri virgülle ayır — izleyiciler #etiket ile arayabilir.</div>
     </div>
     <div class="kutu">
       <h3>Kütüphane <button class="mini gri" onclick="medyaYukle()">Yenile</button></h3>
@@ -155,7 +156,7 @@ pre { white-space: pre-wrap; word-break: break-all; font-size: .7rem; color: var
       </div>
       <div class="satir">
         <input id="test-ad" placeholder="kullanıcı adı" style="width:160px">
-        <select id="test-tur"><option value="video">video</option><option value="ses">ses</option><option value="foto">foto</option></select>
+        <select id="test-tur"><option value="video">video</option><option value="ses">ses</option><option value="foto">foto</option><option value="sinav">şınav</option><option value="mekik">mekik</option></select>
         <button class="gri" onclick="testHak()">Sahte ödül ver (+1 hak)</button>
       </div>
       <div class="aciklama">OBS tarayıcı kaynağı: <b id="overlay-url"></b></div>
@@ -207,9 +208,9 @@ async function kredilerYukle() {
   try {
     const liste = await api("/api/admin/krediler");
     document.querySelector("#t-krediler tbody").innerHTML = liste.map(k =>
-      `<tr><td class="mono">${esc(k.kullanici)}</td><td>${k.video}</td><td>${k.ses}</td><td>${k.foto}</td>
+      `<tr><td class="mono">${esc(k.kullanici)}</td><td>${k.video}</td><td>${k.ses}</td><td>${k.foto}</td><td>${k.sinav || 0}</td><td>${k.mekik || 0}</td>
        <td><button class="mini gri" onclick="hizliDoldur('${esc(k.kullanici)}')">Düzenle</button></td></tr>`
-    ).join("") || `<tr><td colspan="5" style="color:var(--t3)">Henüz hak kazanan yok.</td></tr>`;
+    ).join("") || `<tr><td colspan="7" style="color:var(--t3)">Henüz hak kazanan yok.</td></tr>`;
   } catch (e) { bildir("❌ " + e.message); }
 }
 function hizliDoldur(ad) {
@@ -270,9 +271,10 @@ async function medyaEkle() {
       url: document.getElementById("m-url").value.trim(),
       thumb: document.getElementById("m-thumb").value.trim() || null,
       sure: Number(document.getElementById("m-sure").value) || 0,
+      tagler: document.getElementById("m-tagler").value,
     })});
     bildir("✅ Eklendi.");
-    ["m-baslik", "m-url", "m-thumb", "m-sure"].forEach(id => document.getElementById(id).value = "");
+    ["m-baslik", "m-url", "m-thumb", "m-sure", "m-tagler"].forEach(id => document.getElementById(id).value = "");
     medyaYukle();
   } catch (e) { bildir("❌ " + e.message); }
 }

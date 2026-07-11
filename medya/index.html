@@ -38,7 +38,7 @@ header { position: sticky; top: 0; z-index: 50; background: rgba(5,21,24,.9); ba
 .saray { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 5rem; }
 
 /* hak kartları */
-.haklar { display: grid; grid-template-columns: repeat(3, 1fr); gap: .9rem; margin: 1.2rem 0 2rem; }
+.haklar { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: .9rem; margin: 1.2rem 0 1.2rem; }
 .hak { background: var(--bg2); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.2rem; display: flex; align-items: center; gap: .9rem; }
 .hak .ikon { font-size: 1.4rem; }
 .hak .sayi { font-family: var(--fm); font-size: 1.5rem; font-weight: 600; color: var(--t1); line-height: 1.1; }
@@ -96,6 +96,23 @@ h1 .g { color: var(--acc); }
 .msatir { display: flex; gap: .7rem; }
 .msatir .kbtn { flex: 1; justify-content: center; }
 
+/* egzersiz */
+.egzersizler { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: .9rem; margin-bottom: 2rem; }
+.egz { background: var(--bg2); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.2rem; display: flex; align-items: center; gap: .9rem; flex-wrap: wrap; }
+.egz .baslik { font-weight: 700; font-size: .95rem; }
+.egz .token { font-family: var(--fm); font-size: .75rem; color: var(--t3); }
+.egz .token b { color: var(--yellow); font-size: 1rem; }
+.egz input { width: 70px; background: var(--bg3); border: 1px solid var(--line); border-radius: 8px; color: var(--t1); padding: .45rem .6rem; font-size: .9rem; font-family: var(--fm); outline: none; text-align: center; }
+.egz input:focus { border-color: var(--yellow); }
+.egz button { padding: .5rem 1rem; border-radius: 8px; border: none; background: var(--yellow); color: #051518; font-weight: 700; font-size: .72rem; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; font-family: var(--fb); }
+.egz button:disabled { background: var(--bg3); color: var(--t3); cursor: not-allowed; }
+.egz .doldur { flex: 1; }
+
+/* etiketler */
+.taglar { display: flex; flex-wrap: wrap; gap: .3rem; }
+.tag { font-size: .62rem; font-family: var(--fm); color: var(--t3); background: var(--bg3); padding: .12rem .5rem; border-radius: 50px; cursor: pointer; transition: all .15s; border: 1px solid transparent; }
+.tag:hover { color: var(--acc); border-color: var(--acc); }
+
 /* toast */
 #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--bg3); border: 1px solid var(--lineh); color: var(--t1); padding: .7rem 1.3rem; border-radius: 50px; font-size: .8rem; z-index: 200; transition: transform .25s; max-width: 90vw; text-align: center; }
 #toast.on { transform: translateX(-50%) translateY(0); }
@@ -129,10 +146,32 @@ h1 .g { color: var(--acc); }
 
   <div class="haklar" id="haklar"></div>
 
+  <div class="egzersizler" id="egzersizler">
+    <div class="egz">
+      <span style="font-size:1.4rem">💪</span>
+      <div class="doldur">
+        <div class="baslik">Şınav Çektir</div>
+        <div class="token">token: <b id="egz-sinav-token">—</b></div>
+      </div>
+      <input type="number" id="egz-sinav-adet" min="1" max="50" value="5">
+      <button id="egz-sinav-btn" disabled>Gönder</button>
+    </div>
+    <div class="egz">
+      <span style="font-size:1.4rem">🔥</span>
+      <div class="doldur">
+        <div class="baslik">Mekik Çektir</div>
+        <div class="token">token: <b id="egz-mekik-token">—</b></div>
+      </div>
+      <input type="number" id="egz-mekik-adet" min="1" max="50" value="5">
+      <button id="egz-mekik-btn" disabled>Gönder</button>
+    </div>
+  </div>
+
   <div class="bilgi" id="bilgi">
     Kick kanalında <b>Video Oynat (250)</b>, <b>Ses Oynat (200)</b> veya <b>Foto Oynat (100)</b> ödülünü aldığında
-    hesabına <b>+1 hak</b> eklenir. Hakların kaybolmaz — ister hemen kullan, ister biriktir.
-    Ayrıca eski usul de çalışır: bir medyayı <b>“Seç”</b> ile işaretleyip Kick'te <b>Medya Oynat</b> ödülünü alırsan direkt oynar.
+    hesabına <b>+1 hak</b> eklenir. <b>Şınav/Mekik Token</b> ödülleri de (1x veya 5x) token olarak birikir —
+    kaç token harcarsan yayıncı o kadar şınav/mekik çeker! 💪 Hakların kaybolmaz; ister hemen kullan, ister biriktir.
+    Eski usul de çalışır: bir medyayı <b>“Seç”</b> ile işaretleyip Kick'te <b>Medya Oynat</b> ödülünü alırsan direkt oynar.
   </div>
 
   <div id="durum"></div>
@@ -164,8 +203,8 @@ h1 .g { color: var(--acc); }
 <script src="config.js"></script>
 <script>
 const API = CONFIG.API_BASE;
-const IKONLAR = { video: "🎬", ses: "🎵", foto: "🖼️" };
-const ADLAR = { video: "Video", ses: "Ses", foto: "Foto" };
+const IKONLAR = { video: "🎬", ses: "🎵", foto: "🖼️", sinav: "💪", mekik: "🔥" };
+const ADLAR = { video: "Video", ses: "Ses", foto: "Foto", sinav: "Şınav", mekik: "Mekik" };
 
 let oturum = localStorage.getItem("medya_oturum") || "";
 let ben = null;            // { ad, krediler: {video, ses, foto} }
@@ -221,27 +260,56 @@ function kullaniciCiz() {
 
 function haklarCiz() {
   const kap = document.getElementById("haklar");
-  const k = ben ? ben.krediler : { video: 0, ses: 0, foto: 0 };
-  kap.innerHTML = ["video", "ses", "foto"].map(tur => {
+  const k = ben ? ben.krediler : { video: 0, ses: 0, foto: 0, sinav: 0, mekik: 0 };
+  kap.innerHTML = ["video", "ses", "foto", "sinav", "mekik"].map(tur => {
     const odul = CONFIG.ODULLER.find(o => o.tur === tur);
     const n = k[tur] || 0;
     return `<div class="hak ${n > 0 ? "var" : ""}">
       <div class="ikon">${IKONLAR[tur]}</div>
       <div>
         <div class="sayi">${ben ? n : "—"}</div>
-        <div class="etiket">${ADLAR[tur]} hakkı</div>
-        <div class="puan">${odul ? odul.ad + " · " + odul.puan + " puan" : ""}</div>
+        <div class="etiket">${ADLAR[tur]} ${["sinav","mekik"].includes(tur) ? "token" : "hakkı"}</div>
+        <div class="puan">${odul ? odul.ad + (odul.puan ? " · " + odul.puan + " puan" : "") : ""}</div>
       </div>
     </div>`;
   }).join("");
+  egzersizCiz();
 }
+
+function egzersizCiz() {
+  const k = ben ? ben.krediler : null;
+  for (const tur of ["sinav", "mekik"]) {
+    document.getElementById(`egz-${tur}-token`).textContent = k ? (k[tur] || 0) : "—";
+    document.getElementById(`egz-${tur}-btn`).disabled = !k || (k[tur] || 0) < 1;
+  }
+}
+
+async function egzersizGonder(tur) {
+  const girdi = document.getElementById(`egz-${tur}-adet`);
+  const adet = parseInt(girdi.value, 10);
+  if (!Number.isInteger(adet) || adet < 1 || adet > 50) { toast("1 ile 50 arasında bir sayı gir.", "kotu"); return; }
+  const btn = document.getElementById(`egz-${tur}-btn`);
+  btn.disabled = true;
+  try {
+    const r = await api("/api/egzersiz", { method: "POST", body: JSON.stringify({ tur, adet }) });
+    ben.krediler = r.krediler;
+    haklarCiz();
+    toast(`✅ ${adet} ${ADLAR[tur].toLocaleLowerCase("tr")} sıraya girdi! Sıra: ${r.sira} ${tur === "sinav" ? "💪" : "🔥"}`, "iyi");
+  } catch (e) { toast("❌ " + e.message, "kotu"); }
+  egzersizCiz();
+}
+document.getElementById("egz-sinav-btn").onclick = () => egzersizGonder("sinav");
+document.getElementById("egz-mekik-btn").onclick = () => egzersizGonder("mekik");
 
 function gridCiz() {
   const grid = document.getElementById("grid");
-  const liste = medyalar.filter(m =>
-    (filtre === "hepsi" || m.tur === filtre) &&
-    (!aramaMetni || (m.baslik || "").toLocaleLowerCase("tr").includes(aramaMetni))
-  );
+  const liste = medyalar.filter(m => {
+    if (filtre !== "hepsi" && m.tur !== filtre) return false;
+    if (!aramaMetni) return true;
+    const taglar = (m.tagler || []).map(t => String(t).toLocaleLowerCase("tr"));
+    if (aramaMetni.startsWith("#")) return taglar.some(t => t.includes(aramaMetni.slice(1))); // #etiket araması
+    return (m.baslik || "").toLocaleLowerCase("tr").includes(aramaMetni) || taglar.some(t => t.includes(aramaMetni));
+  });
   if (!liste.length) {
     grid.innerHTML = `<div class="bos">${medyalar.length ? "Eşleşen medya yok." : "Kütüphane henüz boş."}</div>`;
     return;
@@ -252,10 +320,14 @@ function gridCiz() {
     const kapak = m.thumb
       ? `<img src="${esc(tamUrl(m.thumb))}" alt="" loading="lazy">`
       : (m.tur === "foto" ? `<img src="${esc(tamUrl(m.url))}" alt="" loading="lazy">` : IKONLAR[m.tur] || "🎬");
+    const taglarHtml = (m.tagler || []).length
+      ? `<div class="taglar">${m.tagler.map(t => `<span class="tag" data-tag="${esc(t)}">#${esc(t)}</span>`).join("")}</div>`
+      : "";
     return `<div class="kart">
       <div class="kapak">${kapak}<span class="rozet ${m.tur}">${ADLAR[m.tur] || m.tur}</span></div>
       <div class="kgovde">
         <div class="kbaslik">${esc(m.baslik)}</div>
+        ${taglarHtml}
         <div class="ksatir">
           <button class="oynat-btn" data-id="${m.id}" ${!ben || !hakVar ? "disabled" : ""}>
             ${!ben ? "Giriş yap" : hakVar ? "Oynat · 1 hak" : "Hakkın yok"}
@@ -268,6 +340,11 @@ function gridCiz() {
 
   grid.querySelectorAll(".oynat-btn[data-id]").forEach(b => b.onclick = () => modalAc(Number(b.dataset.id)));
   grid.querySelectorAll(".sec-btn").forEach(b => b.onclick = () => sec(Number(b.dataset.sec)));
+  grid.querySelectorAll(".tag").forEach(t => t.onclick = () => {
+    document.getElementById("ara").value = "#" + t.dataset.tag;
+    aramaMetni = ("#" + t.dataset.tag).toLocaleLowerCase("tr");
+    gridCiz();
+  });
 }
 
 function esc(s) { return String(s || "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }

@@ -7,14 +7,18 @@
 /* OBS tarayıcı kaynağı: 1920x1080 önerilir, arka plan şeffaf */
 html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: transparent; overflow: hidden; font-family: "DM Sans", "Segoe UI", sans-serif; }
 
+/* fade: her şey .5 sn'de görünür/kaybolur */
+#sahne, #etiket, #egzersiz { opacity: 0; transition: opacity .5s ease; pointer-events: none; }
+#sahne.gorunur, #etiket.gorunur, #egzersiz.gorunur { opacity: 1; }
+
 #sahne { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; }
-#sahne.on { display: flex; }
+#sahne.aktif { display: flex; }
 
 video, img.foto { max-width: 72%; max-height: 72%; border-radius: 14px; box-shadow: 0 20px 80px rgba(0,0,0,.6); }
 
 /* ses için görsel */
-#ses-kutu { display: none; background: rgba(5,21,24,.92); border: 1px solid rgba(23,155,61,.5); border-radius: 16px; padding: 28px 44px; align-items: center; gap: 22px; box-shadow: 0 20px 80px rgba(0,0,0,.6); }
-#ses-kutu.on { display: flex; }
+#ses-kutu { display: none; background: rgba(5,21,24,.92); border: 1px solid rgba(23,155,61,.5); border-radius: 16px; padding: 30px 50px; align-items: center; gap: 22px; box-shadow: 0 20px 80px rgba(0,0,0,.6); }
+#ses-kutu.aktif { display: flex; }
 .cubuklar { display: flex; gap: 5px; align-items: flex-end; height: 44px; }
 .cubuklar span { width: 7px; background: #179B3D; border-radius: 3px; animation: zipla 1s ease-in-out infinite; }
 .cubuklar span:nth-child(2) { animation-delay: .15s; }
@@ -22,12 +26,21 @@ video, img.foto { max-width: 72%; max-height: 72%; border-radius: 14px; box-shad
 .cubuklar span:nth-child(4) { animation-delay: .45s; }
 .cubuklar span:nth-child(5) { animation-delay: .6s; }
 @keyframes zipla { 0%,100% { height: 10px; } 50% { height: 44px; } }
-#ses-baslik { color: #EDF1F2; font-size: 22px; font-weight: 700; max-width: 480px; }
+#ses-nota { font-size: 40px; }
 
-/* etiket */
-#etiket { position: absolute; left: 50%; transform: translateX(-50%); bottom: 7%; display: none; background: rgba(5,21,24,.9); border: 1px solid rgba(250,202,59,.5); color: #FACA3B; padding: 8px 22px; border-radius: 50px; font-size: 18px; font-weight: 600; letter-spacing: .3px; }
-#etiket.on { display: block; }
-#etiket b { color: #fff; }
+/* etiket: sadece @isim */
+#etiket { position: absolute; left: 50%; transform: translateX(-50%); bottom: 7%; display: none; background: rgba(5,21,24,.9); border: 1px solid rgba(250,202,59,.5); color: #FACA3B; padding: 9px 26px; border-radius: 50px; font-size: 20px; font-weight: 700; letter-spacing: .3px; }
+#etiket.aktif { display: block; }
+
+/* egzersiz banner'ı */
+#egzersiz { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: none; background: rgba(5,21,24,.94); border: 2px solid #FACA3B; border-radius: 20px; padding: 34px 60px; text-align: center; box-shadow: 0 20px 90px rgba(0,0,0,.7); }
+#egzersiz.aktif { display: block; }
+#egzersiz .buyuk { font-size: 56px; font-weight: 800; color: #fff; letter-spacing: 1px; }
+#egzersiz .buyuk b { color: #FACA3B; }
+#egzersiz .kim { margin-top: 10px; font-size: 22px; color: #88A4AB; }
+#egzersiz .kim b { color: #179B3D; }
+#egzersiz .buyuk .titre { display: inline-block; animation: titre .5s ease-in-out infinite; }
+@keyframes titre { 0%,100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
 </style>
 </head>
 <body>
@@ -37,11 +50,15 @@ video, img.foto { max-width: 72%; max-height: 72%; border-radius: 14px; box-shad
   <img id="foto" class="foto" alt="">
   <div id="ses-kutu">
     <div class="cubuklar"><span></span><span></span><span></span><span></span><span></span></div>
-    <div id="ses-baslik"></div>
+    <div id="ses-nota">🎵</div>
     <audio id="ses"></audio>
   </div>
 </div>
 <div id="etiket"></div>
+<div id="egzersiz">
+  <div class="buyuk"><span class="titre" id="egz-ikon">💪</span> <b id="egz-adet"></b> <span id="egz-tur"></span>!</div>
+  <div class="kim">isteyen: <b id="egz-kim"></b></div>
+</div>
 
 <script src="config.js"></script>
 <script>
@@ -49,6 +66,7 @@ const API = CONFIG.API_BASE;
 const YOKLAMA_MS = 3000;        // sıra kontrol aralığı
 const FOTO_SURE_SN = 10;        // foto varsayılan süresi
 const AZAMI_SURE_SN = 600;      // her ihtimale karşı üst sınır (10 dk)
+const FADE_MS = 500;            // giriş/çıkış solma süresi
 
 const sahne = document.getElementById("sahne");
 const videoEl = document.getElementById("video");
@@ -56,16 +74,27 @@ const fotoEl = document.getElementById("foto");
 const sesKutu = document.getElementById("ses-kutu");
 const sesEl = document.getElementById("ses");
 const etiket = document.getElementById("etiket");
+const egzersizEl = document.getElementById("egzersiz");
 
 let mesgul = false;
 let guvenlikZamani = null;
+let bittiCagirildi = false;
 
-function tamUrl(u) { return /^https?:\/\//.test(u) ? u : u; } // göreli yollar /medya/ altından çözülür
+function esc(s) { return String(s || "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+function tamUrl(u) { return u; } // göreli yollar /medya/ altından çözülür
+
+function fadeIn() {
+  // display'i aç, bir kare bekle, sonra opaklığı arttır ki geçiş çalışsın
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    sahne.classList.add("gorunur");
+    etiket.classList.add("gorunur");
+    egzersizEl.classList.add("gorunur");
+  }));
+}
 
 function temizle() {
-  sahne.classList.remove("on");
-  etiket.classList.remove("on");
-  sesKutu.classList.remove("on");
+  ["gorunur", "aktif"].forEach(c => { sahne.classList.remove(c); etiket.classList.remove(c); egzersizEl.classList.remove(c); });
+  sesKutu.classList.remove("aktif");
   videoEl.style.display = "none";
   fotoEl.style.display = "none";
   videoEl.pause(); videoEl.removeAttribute("src"); videoEl.load();
@@ -73,20 +102,45 @@ function temizle() {
   clearTimeout(guvenlikZamani);
 }
 
+// önce yumuşakça kaybol, sonra temizlik + sıradakine geç
 async function bitti() {
+  if (bittiCagirildi) return;
+  bittiCagirildi = true;
+  clearTimeout(guvenlikZamani);
+  sahne.classList.remove("gorunur");
+  etiket.classList.remove("gorunur");
+  egzersizEl.classList.remove("gorunur");
+  await new Promise(r => setTimeout(r, FADE_MS + 50));
   temizle();
   try { await fetch(API + "/api/overlay/bitti", { method: "POST" }); } catch (e) {}
   mesgul = false;
 }
 
 function etiketGoster(medya) {
-  etiket.innerHTML = `🎁 <b>@${medya.izleyici}</b> · ${medya.baslik}`;
-  etiket.classList.add("on");
+  etiket.innerHTML = "🎁 @" + esc(medya.izleyici);
+  etiket.classList.add("aktif");
 }
 
 function oynat(medya) {
   mesgul = true;
-  sahne.classList.add("on");
+  bittiCagirildi = false;
+
+  // ---- şınav / mekik ----
+  if (medya.tur === "egzersiz") {
+    const sinavMi = medya.egzersizTur === "sinav";
+    document.getElementById("egz-ikon").textContent = sinavMi ? "💪" : "🔥";
+    document.getElementById("egz-adet").textContent = medya.adet;
+    document.getElementById("egz-tur").textContent = sinavMi ? "ŞINAV" : "MEKİK";
+    document.getElementById("egz-kim").textContent = "@" + medya.izleyici;
+    egzersizEl.classList.add("aktif");
+    fadeIn();
+    const sureSn = Math.min(30, 8 + Number(medya.adet || 0)); // adet arttıkça ekranda daha uzun kalır
+    guvenlikZamani = setTimeout(bitti, sureSn * 1000);
+    return;
+  }
+
+  // ---- medya ----
+  sahne.classList.add("aktif");
   etiketGoster(medya);
 
   const url = tamUrl(medya.url);
@@ -98,18 +152,18 @@ function oynat(medya) {
     videoEl.src = url;
     videoEl.onended = bitti;
     videoEl.onerror = bitti;
-    videoEl.play().catch(bitti);
+    videoEl.play().then(fadeIn).catch(bitti);
   } else if (medya.tur === "ses") {
-    sesKutu.classList.add("on");
-    document.getElementById("ses-baslik").textContent = medya.baslik;
+    sesKutu.classList.add("aktif");
     sesEl.src = url;
     sesEl.onended = bitti;
     sesEl.onerror = bitti;
-    sesEl.play().catch(bitti);
+    sesEl.play().then(fadeIn).catch(bitti);
   } else if (medya.tur === "foto") {
     fotoEl.style.display = "block";
-    fotoEl.src = url;
+    fotoEl.onload = fadeIn;
     fotoEl.onerror = bitti;
+    fotoEl.src = url;
     clearTimeout(guvenlikZamani);
     guvenlikZamani = setTimeout(bitti, (medya.sure > 0 ? medya.sure : FOTO_SURE_SN) * 1000);
   } else {
@@ -122,7 +176,7 @@ async function yokla() {
   try {
     const r = await fetch(API + "/api/overlay/siradaki");
     const medya = await r.json();
-    if (medya && medya.url) oynat(medya);
+    if (medya && (medya.url || medya.tur === "egzersiz")) oynat(medya);
   } catch (e) {}
 }
 
