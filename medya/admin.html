@@ -67,8 +67,31 @@ pre { white-space: pre-wrap; word-break: break-all; font-size: .7rem; color: var
     <button class="sekme on" data-p="krediler">Haklar</button>
     <button class="sekme" data-p="kuyruk">Kuyruk</button>
     <button class="sekme" data-p="medya">Kütüphane</button>
+    <button class="sekme" data-p="tts">TTS</button>
     <button class="sekme" data-p="loglar">Loglar</button>
     <button class="sekme" data-p="kurulum">Kurulum</button>
+  </div>
+
+  <!-- TTS -->
+  <div class="panel" id="p-tts">
+    <div class="kutu">
+      <h3>ElevenLabs API anahtarı</h3>
+      <div class="satir">
+        <input id="el-key" type="password" placeholder="elevenlabs.io → Profile → API Keys" style="width:320px">
+        <button onclick="elKeyKaydet()">Kaydet ve doğrula</button>
+      </div>
+      <div class="aciklama">Ücretsiz hesap: elevenlabs.io → kayıt ol → sağ üst profil → <b>API Keys</b> → anahtar oluştur, buraya yapıştır. Ücretsiz pakette ayda 10.000 kredi var (Flash modelde ≈ 20.000 karakter TTS).</div>
+    </div>
+    <div class="kutu">
+      <h3>Ses eşleme (ElevenLabs voice ID) <button class="mini gri" onclick="elSesleriYukle()">Yenile</button></h3>
+      <div id="el-sesler"></div>
+      <div class="satir" style="margin-top:.8rem"><button onclick="elSesleriKaydet()">Eşlemeleri kaydet</button></div>
+      <div class="aciklama">
+        Karakter sesi eklemek için: elevenlabs.io → <b>Voices → Explore</b> → karakteri ara (örn. "Arthur Morgan", "GLaDOS", "villager")
+        → beğendiğini <b>My Voices</b>'a ekle → sesin <b>ID</b>'sini kopyala (ses kartında ⋮ → Copy Voice ID) → buradaki kutusuna yapıştır → kaydet.
+        Boş bırakılan karakterler en yakın klasik sesle konuşur. 4 klasik ses hazır gelir, istersen onları da değiştir.
+      </div>
+    </div>
   </div>
 
   <!-- HAKLAR -->
@@ -77,7 +100,7 @@ pre { white-space: pre-wrap; word-break: break-all; font-size: .7rem; color: var
       <h3>Elle hak ekle / çıkar (hata düzeltme)</h3>
       <div class="satir">
         <input id="k-ad" placeholder="kick kullanıcı adı" style="width:200px">
-        <select id="k-tur"><option value="video">video</option><option value="ses">ses</option><option value="foto">foto</option><option value="sinav">şınav token</option><option value="mekik">mekik token</option></select>
+        <select id="k-tur"><option value="video">video</option><option value="ses">ses</option><option value="foto">foto</option><option value="sinav">şınav token</option><option value="tts">tts token</option></select>
         <input id="k-delta" type="number" value="1" style="width:80px">
         <button onclick="krediDegistir()">Uygula</button>
       </div>
@@ -85,7 +108,7 @@ pre { white-space: pre-wrap; word-break: break-all; font-size: .7rem; color: var
     </div>
     <div class="kutu">
       <h3>Tüm izleyiciler <button class="mini gri" onclick="kredilerYukle()">Yenile</button></h3>
-      <table id="t-krediler"><thead><tr><th>Kullanıcı</th><th>🎬 Video</th><th>🎵 Ses</th><th>🖼️ Foto</th><th>💪 Şınav</th><th>🔥 Mekik</th><th></th></tr></thead><tbody></tbody></table>
+      <table id="t-krediler"><thead><tr><th>Kullanıcı</th><th>🎬 Video</th><th>🎵 Ses</th><th>🖼️ Foto</th><th>💪 Şınav</th><th>🎤 TTS</th><th></th></tr></thead><tbody></tbody></table>
     </div>
   </div>
 
@@ -100,6 +123,16 @@ pre { white-space: pre-wrap; word-break: break-all; font-size: .7rem; color: var
 
   <!-- KÜTÜPHANE -->
   <div class="panel" id="p-medya">
+    <div class="kutu">
+      <h3>📤 PC'den direkt foto ekle</h3>
+      <div class="satir">
+        <input type="file" id="f-dosya" accept="image/*" style="color:var(--t2); font-size:.8rem">
+        <input id="f-baslik" placeholder="başlık (boşsa dosya adı)" style="width:200px">
+        <input id="f-tagler" placeholder="etiketler (ops.)" style="width:180px">
+        <button onclick="fotoYukle()" id="f-btn">Yükle ve Ekle</button>
+      </div>
+      <div class="aciklama">Fotoyu seç, tek tıkla hem yüklenir hem kütüphaneye eklenir — GitHub'a girmene gerek yok. Büyük fotolar otomatik küçültülür.</div>
+    </div>
     <div class="kutu">
       <h3>Medya ekle</h3>
       <div class="satir">
@@ -156,7 +189,7 @@ pre { white-space: pre-wrap; word-break: break-all; font-size: .7rem; color: var
       </div>
       <div class="satir">
         <input id="test-ad" placeholder="kullanıcı adı" style="width:160px">
-        <select id="test-tur"><option value="video">video</option><option value="ses">ses</option><option value="foto">foto</option><option value="sinav">şınav</option><option value="mekik">mekik</option></select>
+        <select id="test-tur"><option value="video">video</option><option value="ses">ses</option><option value="foto">foto</option><option value="sinav">şınav</option><option value="tts">tts</option></select>
         <button class="gri" onclick="testHak()">Sahte ödül ver (+1 hak)</button>
       </div>
       <div class="aciklama">OBS tarayıcı kaynağı: <b id="overlay-url"></b></div>
@@ -208,7 +241,7 @@ async function kredilerYukle() {
   try {
     const liste = await api("/api/admin/krediler");
     document.querySelector("#t-krediler tbody").innerHTML = liste.map(k =>
-      `<tr><td class="mono">${esc(k.kullanici)}</td><td>${k.video}</td><td>${k.ses}</td><td>${k.foto}</td><td>${k.sinav || 0}</td><td>${k.mekik || 0}</td>
+      `<tr><td class="mono">${esc(k.kullanici)}</td><td>${k.video}</td><td>${k.ses}</td><td>${k.foto}</td><td>${k.sinav || 0}</td><td>${k.tts || 0}</td>
        <td><button class="mini gri" onclick="hizliDoldur('${esc(k.kullanici)}')">Düzenle</button></td></tr>`
     ).join("") || `<tr><td colspan="7" style="color:var(--t3)">Henüz hak kazanan yok.</td></tr>`;
   } catch (e) { bildir("❌ " + e.message); }
@@ -318,7 +351,90 @@ async function testHak() {
   catch (e) { bildir("❌ " + e.message); }
 }
 
-function hepsiniYukle() { kredilerYukle(); kuyrukYukle(); medyaYukle(); loglarYukle(); }
+// ---- ElevenLabs TTS yönetimi ----
+const TTS_SES_ADLARI = {
+  "kalin-erkek": "Kalın Erkek", "ince-erkek": "İnce Erkek", "kalin-kadin": "Kalın Kadın", "ince-kadin": "İnce Kadın",
+  "kufurbaz-haydo": "Küfürbaz Haydo", "arthur-morgan": "Arthur Morgan", "ramiz-karaeski": "Ramiz Karaeski",
+  "darth-vader": "Darth Vader", "minecraft-villager": "Minecraft Villager", "anime-girl": "Tatlı Anime Girl",
+  "john-marston": "John Marston", "dobby": "Dobby", "glados": "GLaDOS", "optimus-prime": "Optimus Prime", "mickey-mouse": "Mickey Mouse",
+};
+async function elKeyKaydet() {
+  try {
+    const r = await api("/api/admin/eleven/key", { method: "POST", body: JSON.stringify({ key: document.getElementById("el-key").value }) });
+    document.getElementById("el-key").value = "";
+    bildir(r.dogrulandi ? `✅ Anahtar doğrulandı! Kalan kredi: ${r.kalanKredi ?? "?"}` : "⚠️ Anahtar kaydedildi ama doğrulanamadı — yanlış olabilir.");
+    elSesleriYukle();
+  } catch (e) { bildir("❌ " + e.message); }
+}
+async function elSesleriYukle() {
+  try {
+    const r = await api("/api/admin/eleven/sesler");
+    const kap = document.getElementById("el-sesler");
+    kap.innerHTML = (r.anahtarVar ? "" : `<div class="aciklama" style="color:var(--yellow); margin-bottom:.6rem">⚠️ Önce yukarıdan ElevenLabs anahtarını kaydet — anahtar yoksa TTS yedek düz sesle çalışır.</div>`) +
+      Object.entries(TTS_SES_ADLARI).map(([id, ad]) => {
+        const deger = r.ozel[id] || "";
+        const varsayilan = r.varsayilan[id] ? ` (hazır: ${r.varsayilan[id].slice(0, 8)}…)` : " (boşsa en yakın klasik)";
+        return `<div class="satir"><span style="width:160px; font-size:.8rem">${ad}</span>
+          <input class="el-ses-girdi" data-ses="${id}" value="${esc(deger)}" placeholder="voice ID${varsayilan}" style="flex:1; min-width:240px; font-family:var(--fm); font-size:.75rem"></div>`;
+      }).join("");
+  } catch (e) { bildir("❌ " + e.message); }
+}
+async function elSesleriKaydet() {
+  const sesler = {};
+  document.querySelectorAll(".el-ses-girdi").forEach(g => { if (g.value.trim()) sesler[g.dataset.ses] = g.value.trim(); });
+  try {
+    const r = await api("/api/admin/eleven/sesler", { method: "POST", body: JSON.stringify({ sesler }) });
+    bildir(`✅ ${Object.keys(r.kayitli).length} eşleme kaydedildi.`);
+  } catch (e) { bildir("❌ " + e.message); }
+}
+
+// ---- PC'den foto yükleme (otomatik küçültme + tek tıkla kütüphaneye ekleme) ----
+function fotoKucult(dosya) {
+  return new Promise((coz, hata) => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 1600;
+      let { width: w, height: h } = img;
+      if (w > MAX || h > MAX) { const o = Math.min(MAX / w, MAX / h); w = Math.round(w * o); h = Math.round(h * o); }
+      const c = document.createElement("canvas");
+      c.width = w; c.height = h;
+      c.getContext("2d").drawImage(img, 0, 0, w, h);
+      c.toBlob(b => b ? coz(b) : hata(new Error("dönüştürülemedi")), "image/jpeg", 0.85);
+    };
+    img.onerror = () => hata(new Error("foto okunamadı"));
+    img.src = URL.createObjectURL(dosya);
+  });
+}
+async function fotoYukle() {
+  const girdi = document.getElementById("f-dosya");
+  const dosya = girdi.files && girdi.files[0];
+  if (!dosya) { bildir("Önce bir foto seç."); return; }
+  const btn = document.getElementById("f-btn");
+  btn.disabled = true; btn.textContent = "Yükleniyor...";
+  try {
+    let veri = dosya;
+    if (dosya.size > 400000 || !/jpe?g|png|webp|gif/i.test(dosya.type)) veri = await fotoKucult(dosya); // büyükse küçült
+    if (veri.size > 1400000) throw new Error("foto küçültülmesine rağmen çok büyük");
+    const ad = dosya.name.replace(/\.[^.]+$/, "") + ".jpg";
+    const y = await fetch(API + "/api/admin/dosya?ad=" + encodeURIComponent(ad), {
+      method: "POST", headers: { "X-Admin-Key": ANAHTAR, "Content-Type": veri.type || "image/jpeg" }, body: veri,
+    });
+    const yj = await y.json();
+    if (!y.ok) throw new Error(yj.hata || "yükleme hatası");
+    await api("/api/admin/medya", { method: "POST", body: JSON.stringify({
+      tur: "foto",
+      baslik: document.getElementById("f-baslik").value.trim() || dosya.name.replace(/\.[^.]+$/, ""),
+      url: yj.url,
+      tagler: document.getElementById("f-tagler").value,
+    })});
+    bildir("✅ Foto yüklendi ve kütüphaneye eklendi!");
+    girdi.value = ""; document.getElementById("f-baslik").value = ""; document.getElementById("f-tagler").value = "";
+    medyaYukle();
+  } catch (e) { bildir("❌ " + e.message); }
+  btn.disabled = false; btn.textContent = "Yükle ve Ekle";
+}
+
+function hepsiniYukle() { kredilerYukle(); kuyrukYukle(); medyaYukle(); loglarYukle(); elSesleriYukle(); }
 if (ANAHTAR) hepsiniYukle(); else medyaYukle();
 </script>
 </body>

@@ -149,28 +149,21 @@ h1 .g { color: var(--acc); }
   <div class="egzersizler" id="egzersizler">
     <div class="egz">
       <span style="font-size:1.4rem">💪</span>
-      <div class="doldur">
-        <div class="baslik">Şınav Çektir</div>
-        <div class="token">token: <b id="egz-sinav-token">—</b></div>
-      </div>
+      <div class="doldur"><div class="baslik">Şınav Çektir</div></div>
       <input type="number" id="egz-sinav-adet" min="1" max="50" value="5">
       <button id="egz-sinav-btn" disabled>Gönder</button>
     </div>
     <div class="egz">
-      <span style="font-size:1.4rem">🔥</span>
-      <div class="doldur">
-        <div class="baslik">Mekik Çektir</div>
-        <div class="token">token: <b id="egz-mekik-token">—</b></div>
-      </div>
-      <input type="number" id="egz-mekik-adet" min="1" max="50" value="5">
-      <button id="egz-mekik-btn" disabled>Gönder</button>
+      <span style="font-size:1.4rem">🎤</span>
+      <div class="doldur"><div class="baslik">TTS Konuştur</div></div>
+      <button id="tts-ac-btn" disabled>Ses Seç &amp; Yaz</button>
     </div>
   </div>
 
   <div class="bilgi" id="bilgi">
     Kick kanalında <b>Video Oynat (250)</b>, <b>Ses Oynat (200)</b> veya <b>Foto Oynat (100)</b> ödülünü aldığında
-    hesabına <b>+1 hak</b> eklenir. <b>Şınav/Mekik Token</b> ödülleri de (1x veya 5x) token olarak birikir —
-    kaç token harcarsan yayıncı o kadar şınav/mekik çeker! 💪 Hakların kaybolmaz; ister hemen kullan, ister biriktir.
+    hesabına <b>+1 hak</b> eklenir. <b>Şınav Token</b> (1x/5x) biriktir, kaç token harcarsan yayıncı o kadar şınav çeker! 💪
+    <b>TTS Token</b> ile de seçtiğin karakter sesiyle yayında mesajını okutursun. 🎤 Hakların kaybolmaz; ister hemen kullan, ister biriktir.
     Eski usul de çalışır: bir medyayı <b>“Seç”</b> ile işaretleyip Kick'te <b>Medya Oynat</b> ödülünü alırsan direkt oynar.
   </div>
 
@@ -185,6 +178,19 @@ h1 .g { color: var(--acc); }
   </div>
 
   <div class="grid" id="grid"><div class="bos">Kütüphane yükleniyor…</div></div>
+</div>
+
+<div id="tts-modal" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(5,21,24,.8); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:1.5rem;">
+  <div class="mkutu" style="max-width:480px;">
+    <h3 style="font-family:var(--fh); font-size:1.1rem; margin-bottom:.8rem;">🎤 TTS Konuştur <span style="color:var(--t3); font-size:.75rem; font-weight:400;">(1 TTS token)</span></h3>
+    <select id="tts-ses" style="width:100%; background:var(--bg3); border:1px solid var(--line); border-radius:8px; color:var(--t1); padding:.6rem .8rem; font-size:.9rem; font-family:var(--fb); outline:none; margin-bottom:.8rem;"></select>
+    <textarea id="tts-metin" maxlength="200" rows="4" placeholder="Yayında okunacak metni yaz... (max 200 karakter)" style="width:100%; background:var(--bg3); border:1px solid var(--line); border-radius:8px; color:var(--t1); padding:.7rem .9rem; font-size:.9rem; font-family:var(--fb); outline:none; resize:vertical; box-sizing:border-box;"></textarea>
+    <div style="text-align:right; font-family:var(--fm); font-size:.7rem; color:var(--t3); margin:.3rem 0 1rem;"><span id="tts-sayac">0</span>/200</div>
+    <div class="msatir" style="display:flex; gap:.7rem;">
+      <button class="kbtn kbtn-ghost" id="tts-vazgec" style="flex:1; justify-content:center;">Vazgeç</button>
+      <button class="kbtn kbtn-fill" id="tts-gonder" style="flex:1; justify-content:center;">Gönder 🎤</button>
+    </div>
+  </div>
 </div>
 
 <div id="modal">
@@ -203,8 +209,8 @@ h1 .g { color: var(--acc); }
 <script src="config.js"></script>
 <script>
 const API = CONFIG.API_BASE;
-const IKONLAR = { video: "🎬", ses: "🎵", foto: "🖼️", sinav: "💪", mekik: "🔥" };
-const ADLAR = { video: "Video", ses: "Ses", foto: "Foto", sinav: "Şınav", mekik: "Mekik" };
+const IKONLAR = { video: "🎬", ses: "🎵", foto: "🖼️", sinav: "💪", tts: "🎤" };
+const ADLAR = { video: "Video", ses: "Ses", foto: "Foto", sinav: "Şınav", tts: "TTS" };
 
 let oturum = localStorage.getItem("medya_oturum") || "";
 let ben = null;            // { ad, krediler: {video, ses, foto} }
@@ -260,15 +266,15 @@ function kullaniciCiz() {
 
 function haklarCiz() {
   const kap = document.getElementById("haklar");
-  const k = ben ? ben.krediler : { video: 0, ses: 0, foto: 0, sinav: 0, mekik: 0 };
-  kap.innerHTML = ["video", "ses", "foto", "sinav", "mekik"].map(tur => {
+  const k = ben ? ben.krediler : { video: 0, ses: 0, foto: 0, sinav: 0, tts: 0 };
+  kap.innerHTML = ["video", "ses", "foto", "sinav", "tts"].map(tur => {
     const odul = CONFIG.ODULLER.find(o => o.tur === tur);
     const n = k[tur] || 0;
     return `<div class="hak ${n > 0 ? "var" : ""}">
       <div class="ikon">${IKONLAR[tur]}</div>
       <div>
         <div class="sayi">${ben ? n : "—"}</div>
-        <div class="etiket">${ADLAR[tur]} ${["sinav","mekik"].includes(tur) ? "token" : "hakkı"}</div>
+        <div class="etiket">${ADLAR[tur]} ${["sinav","tts"].includes(tur) ? "token" : "hakkı"}</div>
         <div class="puan">${odul ? odul.ad + (odul.puan ? " · " + odul.puan + " puan" : "") : ""}</div>
       </div>
     </div>`;
@@ -278,11 +284,44 @@ function haklarCiz() {
 
 function egzersizCiz() {
   const k = ben ? ben.krediler : null;
-  for (const tur of ["sinav", "mekik"]) {
-    document.getElementById(`egz-${tur}-token`).textContent = k ? (k[tur] || 0) : "—";
-    document.getElementById(`egz-${tur}-btn`).disabled = !k || (k[tur] || 0) < 1;
-  }
+  document.getElementById("egz-sinav-btn").disabled = !k || (k.sinav || 0) < 1;
+  document.getElementById("tts-ac-btn").disabled = !k || (k.tts || 0) < 1;
 }
+
+// ---- TTS modalı ----
+const ttsModal = document.getElementById("tts-modal");
+const ttsMetin = document.getElementById("tts-metin");
+(function ttsSesleriDoldur() {
+  const sel = document.getElementById("tts-ses");
+  const klasik = (CONFIG.SESLER || []).slice(0, 4);
+  const karakter = (CONFIG.SESLER || []).slice(4);
+  sel.innerHTML =
+    `<optgroup label="Klasik Sesler">${klasik.map(s => `<option value="${s.id}">${s.ad}</option>`).join("")}</optgroup>` +
+    `<optgroup label="Karakter Sesleri">${karakter.map(s => `<option value="${s.id}">${s.ad}</option>`).join("")}</optgroup>`;
+})();
+document.getElementById("tts-ac-btn").onclick = () => {
+  if (!ben) { toast("Önce Kick ile giriş yap.", "kotu"); return; }
+  ttsModal.style.display = "flex";
+  ttsMetin.focus();
+};
+document.getElementById("tts-vazgec").onclick = () => ttsModal.style.display = "none";
+ttsModal.onclick = e => { if (e.target === ttsModal) ttsModal.style.display = "none"; };
+ttsMetin.oninput = () => document.getElementById("tts-sayac").textContent = ttsMetin.value.length;
+document.getElementById("tts-gonder").onclick = async () => {
+  const metin = ttsMetin.value.trim();
+  if (!metin) { toast("Bir şeyler yaz önce.", "kotu"); return; }
+  const btn = document.getElementById("tts-gonder");
+  btn.disabled = true;
+  try {
+    const r = await api("/api/tts", { method: "POST", body: JSON.stringify({ ses: document.getElementById("tts-ses").value, metin }) });
+    ben.krediler = r.krediler;
+    haklarCiz();
+    ttsMetin.value = ""; document.getElementById("tts-sayac").textContent = "0";
+    ttsModal.style.display = "none";
+    toast(`✅ TTS sıraya girdi! Sıra: ${r.sira} 🎤`, "iyi");
+  } catch (e) { toast("❌ " + e.message, "kotu"); }
+  btn.disabled = false;
+};
 
 async function egzersizGonder(tur) {
   const girdi = document.getElementById(`egz-${tur}-adet`);
@@ -294,12 +333,11 @@ async function egzersizGonder(tur) {
     const r = await api("/api/egzersiz", { method: "POST", body: JSON.stringify({ tur, adet }) });
     ben.krediler = r.krediler;
     haklarCiz();
-    toast(`✅ ${adet} ${ADLAR[tur].toLocaleLowerCase("tr")} sıraya girdi! Sıra: ${r.sira} ${tur === "sinav" ? "💪" : "🔥"}`, "iyi");
+    toast(`✅ ${adet} şınav sıraya girdi! Sıra: ${r.sira} 💪`, "iyi");
   } catch (e) { toast("❌ " + e.message, "kotu"); }
   egzersizCiz();
 }
 document.getElementById("egz-sinav-btn").onclick = () => egzersizGonder("sinav");
-document.getElementById("egz-mekik-btn").onclick = () => egzersizGonder("mekik");
 
 function gridCiz() {
   const grid = document.getElementById("grid");
@@ -348,7 +386,8 @@ function gridCiz() {
 }
 
 function esc(s) { return String(s || "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
-function tamUrl(u) { return /^https?:\/\//.test(u) ? u : u; } // göreli url'ler bu sayfanın klasöründen sunulur
+// Göreli yollar bu sayfanın klasöründen sunulur; Türkçe karakterli dosya adlarını URL'ye uygun hale getir
+function tamUrl(u) { return /^https?:\/\//.test(u) ? u : encodeURI(u); }
 
 // ---- Modal / onay ----
 function modalAc(id) {

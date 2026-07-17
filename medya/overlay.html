@@ -8,8 +8,8 @@
 html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: transparent; overflow: hidden; font-family: "DM Sans", "Segoe UI", sans-serif; }
 
 /* fade: her şey .5 sn'de görünür/kaybolur */
-#sahne, #etiket, #egzersiz { opacity: 0; transition: opacity .5s ease; pointer-events: none; }
-#sahne.gorunur, #etiket.gorunur, #egzersiz.gorunur { opacity: 1; }
+#sahne, #etiket, #egzersiz, #tts { opacity: 0; transition: opacity .5s ease; pointer-events: none; }
+#sahne.gorunur, #etiket.gorunur, #egzersiz.gorunur, #tts.gorunur { opacity: 1; }
 
 #sahne { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; }
 #sahne.aktif { display: flex; }
@@ -32,7 +32,7 @@ video, img.foto { max-width: 72%; max-height: 72%; border-radius: 14px; box-shad
 #etiket { position: absolute; left: 50%; transform: translateX(-50%); bottom: 7%; display: none; background: rgba(5,21,24,.9); border: 1px solid rgba(250,202,59,.5); color: #FACA3B; padding: 9px 26px; border-radius: 50px; font-size: 20px; font-weight: 700; letter-spacing: .3px; }
 #etiket.aktif { display: block; }
 
-/* egzersiz banner'ı */
+/* şınav banner'ı */
 #egzersiz { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: none; background: rgba(5,21,24,.94); border: 2px solid #FACA3B; border-radius: 20px; padding: 34px 60px; text-align: center; box-shadow: 0 20px 90px rgba(0,0,0,.7); }
 #egzersiz.aktif { display: block; }
 #egzersiz .buyuk { font-size: 56px; font-weight: 800; color: #fff; letter-spacing: 1px; }
@@ -41,6 +41,13 @@ video, img.foto { max-width: 72%; max-height: 72%; border-radius: 14px; box-shad
 #egzersiz .kim b { color: #179B3D; }
 #egzersiz .buyuk .titre { display: inline-block; animation: titre .5s ease-in-out infinite; }
 @keyframes titre { 0%,100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
+
+/* tts banner'ı */
+#tts { position: absolute; left: 50%; bottom: 10%; transform: translateX(-50%); display: none; background: rgba(5,21,24,.94); border: 2px solid #179B3D; border-radius: 20px; padding: 22px 36px; max-width: 60%; box-shadow: 0 20px 90px rgba(0,0,0,.7); }
+#tts.aktif { display: block; }
+#tts .kim { font-size: 17px; color: #FACA3B; font-weight: 700; margin-bottom: 6px; }
+#tts .kim span { color: #4E727C; font-weight: 400; font-size: 14px; }
+#tts .soz { font-size: 24px; color: #EDF1F2; line-height: 1.45; font-weight: 500; }
 </style>
 </head>
 <body>
@@ -56,9 +63,15 @@ video, img.foto { max-width: 72%; max-height: 72%; border-radius: 14px; box-shad
 </div>
 <div id="etiket"></div>
 <div id="egzersiz">
-  <div class="buyuk"><span class="titre" id="egz-ikon">💪</span> <b id="egz-adet"></b> <span id="egz-tur"></span>!</div>
+  <div class="buyuk"><span class="titre">💪</span> <b id="egz-adet"></b> ŞINAV!</div>
   <div class="kim">isteyen: <b id="egz-kim"></b></div>
 </div>
+<div id="tts">
+  <div class="kim">🎤 <span id="tts-kim"></span> <span id="tts-ses-adi"></span></div>
+  <div class="soz" id="tts-soz"></div>
+</div>
+<audio id="phonk" src="dosyalar/phonk-giris.mp3" preload="auto"></audio>
+<audio id="tts-audio"></audio>
 
 <script src="config.js"></script>
 <script>
@@ -67,6 +80,8 @@ const YOKLAMA_MS = 3000;        // sıra kontrol aralığı
 const FOTO_SURE_SN = 10;        // foto varsayılan süresi
 const AZAMI_SURE_SN = 600;      // her ihtimale karşı üst sınır (10 dk)
 const FADE_MS = 500;            // giriş/çıkış solma süresi
+const EGZERSIZ_SURE_SN = 6;     // şınav banner'ı ekranda kalma süresi
+const YEDEK_TTS = "https://api.streamelements.com/kappa/v2/speech?voice=Filiz&text="; // ElevenLabs yoksa
 
 const sahne = document.getElementById("sahne");
 const videoEl = document.getElementById("video");
@@ -75,30 +90,35 @@ const sesKutu = document.getElementById("ses-kutu");
 const sesEl = document.getElementById("ses");
 const etiket = document.getElementById("etiket");
 const egzersizEl = document.getElementById("egzersiz");
+const ttsEl = document.getElementById("tts");
+const ttsAudio = document.getElementById("tts-audio");
+const phonkEl = document.getElementById("phonk");
 
 let mesgul = false;
 let guvenlikZamani = null;
 let bittiCagirildi = false;
 
 function esc(s) { return String(s || "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
-function tamUrl(u) { return u; } // göreli yollar /medya/ altından çözülür
+// Göreli yollar /medya/ altından çözülür; Türkçe karakterli dosya adlarını URL'ye uygun hale getir
+function tamUrl(u) { return /^https?:\/\//.test(u) ? u : encodeURI(u); }
+
+// Ses garantisi: OBS tarayıcı kaynağında sesin kısılı kalmaması için her oynatmada aç
+function sesiAc(el) { try { el.muted = false; el.volume = 1.0; } catch (e) {} }
 
 function fadeIn() {
-  // display'i aç, bir kare bekle, sonra opaklığı arttır ki geçiş çalışsın
   requestAnimationFrame(() => requestAnimationFrame(() => {
-    sahne.classList.add("gorunur");
-    etiket.classList.add("gorunur");
-    egzersizEl.classList.add("gorunur");
+    [sahne, etiket, egzersizEl, ttsEl].forEach(e => e.classList.add("gorunur"));
   }));
 }
 
 function temizle() {
-  ["gorunur", "aktif"].forEach(c => { sahne.classList.remove(c); etiket.classList.remove(c); egzersizEl.classList.remove(c); });
+  [sahne, etiket, egzersizEl, ttsEl].forEach(e => { e.classList.remove("gorunur"); e.classList.remove("aktif"); });
   sesKutu.classList.remove("aktif");
   videoEl.style.display = "none";
   fotoEl.style.display = "none";
   videoEl.pause(); videoEl.removeAttribute("src"); videoEl.load();
   sesEl.pause(); sesEl.removeAttribute("src"); sesEl.load();
+  ttsAudio.pause(); ttsAudio.removeAttribute("src"); ttsAudio.load();
   clearTimeout(guvenlikZamani);
 }
 
@@ -107,9 +127,7 @@ async function bitti() {
   if (bittiCagirildi) return;
   bittiCagirildi = true;
   clearTimeout(guvenlikZamani);
-  sahne.classList.remove("gorunur");
-  etiket.classList.remove("gorunur");
-  egzersizEl.classList.remove("gorunur");
+  [sahne, etiket, egzersizEl, ttsEl].forEach(e => e.classList.remove("gorunur"));
   await new Promise(r => setTimeout(r, FADE_MS + 50));
   temizle();
   try { await fetch(API + "/api/overlay/bitti", { method: "POST" }); } catch (e) {}
@@ -121,21 +139,50 @@ function etiketGoster(medya) {
   etiket.classList.add("aktif");
 }
 
+// ============ TTS (ElevenLabs, worker üzerinden) ============
+
+function ttsOynat(medya) {
+  const preset = (CONFIG.SESLER || []).find(s => s.id === medya.ses);
+
+  // banner'ı hemen göster
+  document.getElementById("tts-kim").textContent = "@" + medya.izleyici;
+  document.getElementById("tts-ses-adi").textContent = "· " + (preset ? preset.ad : medya.ses);
+  document.getElementById("tts-soz").textContent = medya.metin;
+  ttsEl.classList.add("aktif");
+  fadeIn();
+
+  guvenlikZamani = setTimeout(bitti, 45000); // her ihtimale karşı üst sınır
+  sesiAc(ttsAudio);
+  ttsAudio.onended = () => setTimeout(bitti, 600);
+
+  // 1) ElevenLabs (worker proxy) -> 2) olmazsa yedek düz TTS -> 3) o da olmazsa 6 sn yazı
+  ttsAudio.onerror = () => {
+    ttsAudio.onerror = () => { clearTimeout(guvenlikZamani); guvenlikZamani = setTimeout(bitti, 6000); };
+    ttsAudio.src = YEDEK_TTS + encodeURIComponent(medya.metin);
+    ttsAudio.play().catch(() => { clearTimeout(guvenlikZamani); guvenlikZamani = setTimeout(bitti, 6000); });
+  };
+  ttsAudio.src = API + "/api/overlay/tts-ses?id=" + medya.id;
+  ttsAudio.play().catch(() => {});
+}
+
+// ============ Oynatıcı ============
+
 function oynat(medya) {
   mesgul = true;
   bittiCagirildi = false;
 
-  // ---- şınav / mekik ----
+  // ---- TTS ----
+  if (medya.tur === "tts") { ttsOynat(medya); return; }
+
+  // ---- şınav ----
   if (medya.tur === "egzersiz") {
-    const sinavMi = medya.egzersizTur === "sinav";
-    document.getElementById("egz-ikon").textContent = sinavMi ? "💪" : "🔥";
     document.getElementById("egz-adet").textContent = medya.adet;
-    document.getElementById("egz-tur").textContent = sinavMi ? "ŞINAV" : "MEKİK";
     document.getElementById("egz-kim").textContent = "@" + medya.izleyici;
     egzersizEl.classList.add("aktif");
     fadeIn();
-    const sureSn = Math.min(30, 8 + Number(medya.adet || 0)); // adet arttıkça ekranda daha uzun kalır
-    guvenlikZamani = setTimeout(bitti, sureSn * 1000);
+    sesiAc(phonkEl);
+    try { phonkEl.currentTime = 0; phonkEl.volume = 0.9; phonkEl.play().catch(() => {}); } catch (e) {}
+    guvenlikZamani = setTimeout(bitti, EGZERSIZ_SURE_SN * 1000);
     return;
   }
 
@@ -149,16 +196,18 @@ function oynat(medya) {
 
   if (medya.tur === "video") {
     videoEl.style.display = "block";
+    sesiAc(videoEl);
     videoEl.src = url;
     videoEl.onended = bitti;
     videoEl.onerror = bitti;
-    videoEl.play().then(fadeIn).catch(bitti);
+    videoEl.play().then(() => { sesiAc(videoEl); fadeIn(); }).catch(bitti);
   } else if (medya.tur === "ses") {
     sesKutu.classList.add("aktif");
+    sesiAc(sesEl);
     sesEl.src = url;
     sesEl.onended = bitti;
     sesEl.onerror = bitti;
-    sesEl.play().then(fadeIn).catch(bitti);
+    sesEl.play().then(() => { sesiAc(sesEl); fadeIn(); }).catch(bitti);
   } else if (medya.tur === "foto") {
     fotoEl.style.display = "block";
     fotoEl.onload = fadeIn;
@@ -176,7 +225,7 @@ async function yokla() {
   try {
     const r = await fetch(API + "/api/overlay/siradaki");
     const medya = await r.json();
-    if (medya && (medya.url || medya.tur === "egzersiz")) oynat(medya);
+    if (medya && (medya.url || medya.tur === "egzersiz" || medya.tur === "tts")) oynat(medya);
   } catch (e) {}
 }
 
