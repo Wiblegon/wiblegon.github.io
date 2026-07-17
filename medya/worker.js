@@ -99,7 +99,7 @@ export default {
     try {
       await dbKur(env);
 
-      if (yol === "/" || yol === "/api/saglik") return cevap({ tamam: true, surum: "medya-v6" }, 200, request, env);
+      if (yol === "/" || yol === "/api/saglik") return cevap({ tamam: true, surum: "medya-v7" }, 200, request, env);
 
       const dosyaEsle = yol.match(/^\/dosya\/([A-Za-z0-9._-]+)$/);
       if (dosyaEsle && request.method === "GET") return dosyaSun(dosyaEsle[1], env);
@@ -139,6 +139,7 @@ export default {
         if (yol === "/api/admin/kick/abone" && request.method === "POST") return adminWebhookAbone(request, env);
         if (yol === "/api/admin/eleven/key" && request.method === "POST") return adminElevenKey(request, env);
         if (yol === "/api/admin/eleven/ara" && request.method === "GET") return adminElevenAra(url, request, env);
+        if (yol === "/api/admin/eleven/hesap" && request.method === "GET") return adminElevenHesap(request, env);
         if (yol === "/api/admin/eleven/ekle" && request.method === "POST") return adminElevenEkle(request, env);
         if (yol === "/api/admin/eleven/sesler" && request.method === "GET") return adminElevenSesler(request, env);
         if (yol === "/api/admin/eleven/sesler" && request.method === "POST") return adminElevenSeslerKaydet(request, env);
@@ -766,6 +767,16 @@ async function adminElevenKey(request, env) {
     dogrulandi: !!bilgi,
     kalanKredi: bilgi?.subscription ? (bilgi.subscription.character_limit - bilgi.subscription.character_count) : null,
   }, 200, request, env);
+}
+
+// Hesaptaki kullanılabilir sesleri listele (premade sesler ücretsiz planda API ile çalışır)
+async function adminElevenHesap(request, env) {
+  const anahtar = await elevenKey(env);
+  if (!anahtar) return cevap({ hata: "önce ElevenLabs anahtarını kaydet" }, 400, request, env);
+  const res = await fetch(EL_API + "/voices", { headers: { "xi-api-key": anahtar } });
+  const j = await res.json().catch(() => null);
+  if (!res.ok) return cevap({ hata: "elevenlabs " + res.status, detay: j }, 502, request, env);
+  return cevap((j?.voices || []).map(v => ({ voice_id: v.voice_id, ad: v.name, kategori: v.category || "" })), 200, request, env);
 }
 
 // ElevenLabs topluluk kütüphanesinde ses ara (karakter sesleri buradan bulunur)
